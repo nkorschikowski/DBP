@@ -1,0 +1,51 @@
+-   shop (name, street, zip)
+    -   item (pgroup, asin, salesrank, picture, detailpage, ean)
+        -   price (mult, state, currency)
+        -   title
+        -   bookspec #Book
+            -   binding
+            -   edition (val)
+            -   isbn (val)
+            -   package (weight, height, length)
+            -   pages
+            -   publication (date)
+        -   dvdspec #DVD
+            -   aspectratio
+            -   format
+            -   regioncode
+            -   releasedate
+            -   runningtime
+            -   theatr_release
+            -   upc (val)
+        -   musicspec #Music
+            -   binding
+            -   format (value)
+            -   num_discs
+            -   releasedate
+            -   upc
+        -   labels
+            -   label (name) ...
+        -   publishers
+            -   publisher (name) ...
+        -   studios
+            -   studio (name) ...
+        -   similars
+            -   sim_product ...
+                -   asin
+                -   title
+        -   tracks
+            -   title ...
+        -   audiotext
+            -   language (type) + audioformat ...
+        -   listmania
+            -   list (name) ...
+        -   actors
+            -   actor (name) ...
+        -   artists
+            -   artist (name) ..
+        -   authors
+            -   author (name) ...
+        -   creators
+            -   creator (name) ...
+        -   directors
+            -   director (name) ...
