@@ -1,0 +1,50 @@
+-   shop (name, street, zip)
+    -   item (pgroup, asin, salesrank)
+        -   title
+        -   price (state, mult, currency)
+        -   ean
+        -   details (img(link))
+        -   listmania
+            -   list ...
+        -   actors #DVD
+            -   actor ...
+        -   artists #CD
+            -   artist ...
+        -   authors #Book
+            -   author
+        -   creators #DVD #Musik # Book
+            -   creator ...
+        -   directors #DVD
+            -   director ...
+        -   labels #Music
+            -   label ...
+        -   publishers #Book
+            -   publisher ...
+        -   studios #DVD
+            -   studio ...
+        -   similars
+            -   item (asin) ...
+        -   tracks #Musik
+            -   title ...
+        -   audiotext #DVD?
+            -   language (type) + audioformat ...
+        -   bookspec #Book
+            -   binding
+            -   edition (val)
+            -   isbn (val)
+            -   package (weight, height, length)
+            -   pages
+            -   publication (date)
+        -   dvdspec #DVD
+            -   aspectratio
+            -   format
+            -   regioncode
+            -   releasedate
+            -   runningtime
+            -   theatr_release
+            -   upc (val)
+        -   musicspec #Music
+            -   binding
+            -   num_discs
+            -   releasedate
+            -   upc
