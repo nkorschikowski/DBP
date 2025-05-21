@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS rezensionen CASCADE;
 CREATE TABLE produkte (
   produkt_nr integer PRIMARY KEY,
   titel varchar,
-  rating float,
+  rating float, -- muss noch nach jedem update erneuert werden
   verkaufsrang integer,
   bild varchar,
   produkttyp varchar
@@ -89,10 +89,15 @@ CREATE TABLE dvd_personen (
 );
 
 CREATE TABLE kategorien (
-  kategorie_id integer PRIMARY KEY,
-  name varchar,
-  parent_kategorie_id integer,
-  FOREIGN KEY (parent_kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE SET NULL
+    kategorie_id integer PRIMARY KEY,
+    name varchar
+);
+
+CREATE TABLE unterkategorie ( -- TODO: reicht nicht aus, da eine Kategorie eine oder mehrere Unterkategorien besitzen kann
+  kategorie_id integer,
+  unterkategorie_id integer,
+  FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
+  FOREIGN KEY (unterkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
 
 CREATE TABLE produkt_kategorie (
@@ -102,7 +107,10 @@ CREATE TABLE produkt_kategorie (
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
 
-CREATE TABLE aehnliche_produkte ( -- a-b ist zwar theoretisch das gleiche wie b-a womit Redundanzen entstehen, man müsste aber rekursiv abfragen und Daten geben auch nur "direkt" ähnlihce Produkte an
+CREATE TABLE aehnliche_produkte (
+-- a-b ist zwar theoretisch das gleiche wie b-a womit Redundanzen entstehen, man müsste aber rekursiv abfragen und Daten geben auch nur "direkt" ähnlihce Produkte an
+-- und ein ähnliches Produkt von einem ähnlichen Produkt von einem ähnlichen Produkt von einem .... hat mit dem ursprünglichen vielleicht nichts mehr zu tun
+-- das wäre dann mit Kategorien abgedeckt
   produkt_nr1 integer,
   produkt_nr2 integer,
   FOREIGN KEY (produkt_nr1) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
@@ -133,16 +141,19 @@ CREATE TABLE kunden (
 CREATE TABLE kauf (
   kauf_id integer PRIMARY KEY,
   kunden_id integer,
-  kaufdatum timestamp,
+  kaufdatum timestamp, -- TODO: oder date?
   FOREIGN KEY (kunden_id) REFERENCES kunden (kunden_id) ON DELETE SET NULL -- vielleicht will man die Kaufdaten noch haben auch wenn man den Kunden nichtmehr zuordnen kann
 );
 
 CREATE TABLE kauf_produkt ( --anzahl hinzufügen?
   kauf_id integer,
   produkt_nr integer,
-  einzelpreis decimal, -- TODO: sollte es sich aus angebot ziehen
+  anzahl integer DEFAULT 1,
+  filiale_id integer, -- oder das in 'kauf'-Table stecken?
+  einzelpreis decimal, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
   FOREIGN KEY (kauf_id) REFERENCES kauf (kauf_id) ON DELETE CASCADE, -- es soll ja der gesamte Kauf gelöscht werden
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE SET NULL --  es wurde ja schon was gekauft, der kauf wird ja nicht annuliert
+  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE SET NULL,
+  FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE CASCADE
 );
 
 CREATE TABLE rezensionen (
