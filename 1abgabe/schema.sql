@@ -101,7 +101,7 @@ CREATE TABLE kategorien (
 CREATE TABLE unterkategorie ( -- TODO: reicht nicht aus, da eine Kategorie eine oder mehrere Unterkategorien besitzen kann
   kategorie_id integer,
   unterkategorie_id integer,
-  PRIMARY KEY (kategorie_id,unterkategorie_id),
+  PRIMARY KEY (kategorie_id, unterkategorie_id),
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
   FOREIGN KEY (unterkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
@@ -109,7 +109,7 @@ CREATE TABLE unterkategorie ( -- TODO: reicht nicht aus, da eine Kategorie eine 
 CREATE TABLE produkt_kategorie (
   produkt_nr integer,
   kategorie_id integer,
-  PRIMARY KEY (produkt_nr,kategorie_id),
+  PRIMARY KEY (produkt_nr, kategorie_id),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
@@ -172,7 +172,7 @@ CREATE TABLE rezensionen (
   produkt_nr integer NOT NULL,
   bewertung integer NOT NULL,
   text varchar, -- TODO: oder text?
-  rezensionsdatum date, -- TODO: oder timestamp?
+  -- rezensionsdatum date,   /// ist zumindest nicht gefordert
   FOREIGN KEY (kunden_id) REFERENCES kunden (kunden_id) ON DELETE SET NULL, --Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE --ich brauche keine Rezension zu einem Produkt, dass ich nicht anbiete
 );
