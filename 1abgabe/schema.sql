@@ -70,6 +70,7 @@ CREATE TABLE personen (
 CREATE TABLE autoren_buecher (
   produkt_nr integer,
   person_id integer,
+  PRIMARY KEY (produkt_nr, person_id),
   FOREIGN KEY (produkt_nr) REFERENCES buecher (produkt_nr) ON DELETE CASCADE, -- ohne Buch kein Autor
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL -- ohne Person Autor nur unklar, aber Buch existiert tortzdem
 );
@@ -77,14 +78,16 @@ CREATE TABLE autoren_buecher (
 CREATE TABLE kuenstler_cds (
   produkt_nr integer,
   person_id integer,
+  PRIMARY KEY (produkt_nr, person_id),
   FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE, -- ohne CD kein Künstler
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL -- ohne Person kein künstler, aber CD gibts ja noch
 );
 
-CREATE TABLE dvd_personen (
+CREATE TABLE dvd_personen ( -- TODO:aufteilen in die Rollen?
   produkt_nr integer,
   person_id integer,
   rolle varchar,
+  PRIMARY KEY (produkt_nr, person_id),
   FOREIGN KEY (produkt_nr) REFERENCES dvds (produkt_nr) ON DELETE CASCADE, -- ohne DVD keine Related Person
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL -- Ohne Person existiert Film trotzdem noch
 );
@@ -97,6 +100,7 @@ CREATE TABLE kategorien (
 CREATE TABLE unterkategorie ( -- TODO: reicht nicht aus, da eine Kategorie eine oder mehrere Unterkategorien besitzen kann
   kategorie_id integer,
   unterkategorie_id integer,
+  PRIMARY KEY (kategorie_id,unterkategorie_id),
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
   FOREIGN KEY (unterkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
@@ -104,6 +108,7 @@ CREATE TABLE unterkategorie ( -- TODO: reicht nicht aus, da eine Kategorie eine 
 CREATE TABLE produkt_kategorie (
   produkt_nr integer,
   kategorie_id integer,
+  PRIMARY KEY (produkt_nr,kategorie_id),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
@@ -114,6 +119,7 @@ CREATE TABLE aehnliche_produkte (
 -- das wäre dann mit Kategorien abgedeckt
   produkt_nr1 integer,
   produkt_nr2 integer,
+  PRIMARY KEY (produkt_nr1, produkt_nr2),
   FOREIGN KEY (produkt_nr1) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (produkt_nr2) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
 );
@@ -129,13 +135,14 @@ CREATE TABLE angebote (
   filiale_id integer,
   preis decimal,
   zustand varchar,
+  PRIMARY KEY (produkt_nr, filiale_id),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE CASCADE
 );
 
-CREATE TABLE kunden (
+CREATE TABLE kunden ( -- TODO: mit Personen verknüpfen ( auch wegen Name) // gefordert sind bei Kunden aber nur Anschrift und Kontonummer
   kunden_id integer PRIMARY KEY,
-  adresse varchar,
+  adresse varchar, -- aufteilen in neuer Tabelle ? (Starße, Nr., PLZ, Stadt)?
   kontonummer varchar
 );
 
@@ -152,13 +159,14 @@ CREATE TABLE kauf_produkt ( --anzahl hinzufügen?
   anzahl integer DEFAULT 1,
   filiale_id integer, -- oder das in 'kauf'-Table stecken?
   einzelpreis decimal, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
+  PRIMARY KEY (kauf_id, produkt_nr), -- TODO: filiale_id noch dazu?
   FOREIGN KEY (kauf_id) REFERENCES kauf (kauf_id) ON DELETE CASCADE, -- es soll ja der gesamte Kauf gelöscht werden
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE SET NULL,
   FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE CASCADE
 );
 
 CREATE TABLE rezensionen (
-  rezension_id integer PRIMARY KEY,
+  rezension_id integer PRIMARY KEY, -- TODO: oder composite key (kunden_id, produkt_nr) weil ein Kunde ein Produkt ja nur ein mal bewerten darf  /// nach Aufgabe / Query optimieren?
   kunden_id integer,
   produkt_nr integer,
   bewertung integer,
