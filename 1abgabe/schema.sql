@@ -34,7 +34,7 @@ CREATE TABLE buecher (
   produkt_nr integer PRIMARY KEY,
   seitenzahl integer,
   erscheinungsdatum date,
-  isbn varchar,
+  isbn varchar UNIQUE NOT NULL ,
   verlag varchar,
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
 );
@@ -58,7 +58,7 @@ CREATE TABLE musikcds (
 CREATE TABLE titel (
   titel_id integer PRIMARY KEY, -- weil Songs gleich heißen können
   name varchar,
-  produkt_nr integer,
+  produkt_nr integer UNIQUE NOT NULL,
   FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE
 );
 
@@ -87,14 +87,15 @@ CREATE TABLE dvd_personen ( -- TODO:aufteilen in die Rollen?
   produkt_nr integer,
   person_id integer,
   rolle varchar,
-  PRIMARY KEY (produkt_nr, person_id),
+  PRIMARY KEY (produkt_nr, person_id), -- TODO: wenn wir hier 'rolle' noch mit reinnehmen müssen wir keine Extra Tabelle machen
   FOREIGN KEY (produkt_nr) REFERENCES dvds (produkt_nr) ON DELETE CASCADE, -- ohne DVD keine Related Person
-  FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL -- Ohne Person existiert Film trotzdem noch
+  FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL,  -- Ohne Person existiert Film trotzdem noch
+  CHECK (rolle IN ('Producer', 'Actor', 'Director')) -- falls wir nicht eigene Tabellen dafür machen wollen
 );
 
 CREATE TABLE kategorien (
     kategorie_id integer PRIMARY KEY,
-    name varchar
+    name varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE unterkategorie ( -- TODO: reicht nicht aus, da eine Kategorie eine oder mehrere Unterkategorien besitzen kann
@@ -126,14 +127,14 @@ CREATE TABLE aehnliche_produkte (
 
 CREATE TABLE filialen (
   filiale_id integer PRIMARY KEY,
-  name varchar,
+  name varchar NOT NULL, -- nicht UNIQUE  wegen Franchises
   anschrift varchar
 );
 
 CREATE TABLE angebote (
   produkt_nr integer,
   filiale_id integer,
-  preis decimal,
+  preis decimal, -- nicht NOT NULL wegen Rabatt/Aktionen etc.
   zustand varchar,
   PRIMARY KEY (produkt_nr, filiale_id),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
@@ -142,23 +143,23 @@ CREATE TABLE angebote (
 
 CREATE TABLE kunden ( -- TODO: mit Personen verknüpfen ( auch wegen Name) // gefordert sind bei Kunden aber nur Anschrift und Kontonummer
   kunden_id integer PRIMARY KEY,
-  adresse varchar, -- aufteilen in neuer Tabelle ? (Starße, Nr., PLZ, Stadt)?
-  kontonummer varchar
+  adresse varchar NOT NULL, -- aufteilen in neuer Tabelle ? (Starße, Nr., PLZ, Stadt)?
+  kontonummer varchar NOT NULL
 );
 
 CREATE TABLE kauf (
   kauf_id integer PRIMARY KEY,
-  kunden_id integer,
-  kaufdatum timestamp, -- TODO: oder date?
+  kunden_id integer NOT NULL,
+  kaufdatum timestamp NOT NULL, -- TODO: oder date?
   FOREIGN KEY (kunden_id) REFERENCES kunden (kunden_id) ON DELETE SET NULL -- vielleicht will man die Kaufdaten noch haben auch wenn man den Kunden nichtmehr zuordnen kann
 );
 
 CREATE TABLE kauf_produkt ( --anzahl hinzufügen?
   kauf_id integer,
   produkt_nr integer,
-  anzahl integer DEFAULT 1,
-  filiale_id integer, -- oder das in 'kauf'-Table stecken?
-  einzelpreis decimal, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
+  anzahl integer NOT NULL DEFAULT 1,
+  filiale_id integer NOT NULL, -- oder das in 'kauf'-Table stecken?
+  einzelpreis decimal NOT NULL, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
   PRIMARY KEY (kauf_id, produkt_nr), -- TODO: filiale_id noch dazu?
   FOREIGN KEY (kauf_id) REFERENCES kauf (kauf_id) ON DELETE CASCADE, -- es soll ja der gesamte Kauf gelöscht werden
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE SET NULL,
@@ -167,9 +168,9 @@ CREATE TABLE kauf_produkt ( --anzahl hinzufügen?
 
 CREATE TABLE rezensionen (
   rezension_id integer PRIMARY KEY, -- TODO: oder composite key (kunden_id, produkt_nr) weil ein Kunde ein Produkt ja nur ein mal bewerten darf  /// nach Aufgabe / Query optimieren?
-  kunden_id integer,
-  produkt_nr integer,
-  bewertung integer,
+  kunden_id integer NOT NULL,
+  produkt_nr integer NOT NULL,
+  bewertung integer NOT NULL,
   text varchar, -- TODO: oder text?
   rezensionsdatum date, -- TODO: oder timestamp?
   FOREIGN KEY (kunden_id) REFERENCES kunden (kunden_id) ON DELETE SET NULL, --Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
