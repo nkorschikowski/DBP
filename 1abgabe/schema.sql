@@ -24,48 +24,48 @@ DROP TABLE IF EXISTS rezensionen CASCADE;
 
 CREATE TABLE produkte (
   produkt_nr integer PRIMARY KEY,
-  titel varchar,
+  titel varchar(255),
   rating float, -- TODO: muss noch nach jedem update erneuert werden
   verkaufsrang integer UNIQUE, -- TODO: nach Ratings oder nach verkäufen? /// nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
-  bild varchar, -- varchar, weil  es ne URL ist TODO: reichen 255?
-  produkttyp varchar
-  -- TODO: CHECK produkttyp
+  bild varchar(500),
+  produkttyp varchar(255),
+   CHECK (rolle IN ('Book','Music','DVD'))
 );
 
 CREATE TABLE buecher (
   produkt_nr integer PRIMARY KEY,
   seitenzahl integer,
   erscheinungsdatum date,
-  isbn varchar UNIQUE NOT NULL,
-  verlag varchar,
+  isbn bigint UNIQUE NOT NULL, -- ISBN sollten eigentlich nur 10-Stellige Nummern sein (in der Datenbank aber auch Einträge mit einem 'X' am Ende gesehen => wahrscheinlich invalid)
+  verlag varchar(255),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
 );
 
 CREATE TABLE dvds (
   produkt_nr integer PRIMARY KEY,
-  format varchar,
-  laufzeit integer, -- TODO: type time?
-  region_code varchar, -- TODO: welcher TYPE
+  format varchar(255),
+  laufzeit time,
+  region_code tinyint, -- 0-8
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
 );
 
 CREATE TABLE musikcds (
   produkt_nr integer PRIMARY KEY,
-  label varchar,
+  label varchar(255),
   erscheinungsdatum date,
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
 );
 
 CREATE TABLE titel ( -- FEATURE: n:m tabelle machen (oder composite key?) für einfachere Abfrage "Auf welchen Alben finde ich das Lied Ocean von Peter" // kann ja auf mehreren sein ("Best of ...")
   titel_id integer PRIMARY KEY, -- weil Songs gleich heißen können
-  name varchar,
+  name varchar(255),
   produkt_nr integer UNIQUE NOT NULL,
   FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE
 );
 
 CREATE TABLE personen (
   person_id integer PRIMARY KEY,
-  name varchar NOT NULL
+  name varchar(255) NOT NULL
 );
 
 CREATE TABLE autoren_buecher (
@@ -84,10 +84,10 @@ CREATE TABLE kuenstler_cds (
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE CASCADE -- wenn die Person Weg ist, existiert das Produkt noch, sie haben nur nichts mehr miteinander zu tun
 );
 
-CREATE TABLE dvd_personen ( -- TODO aufteilen in die Rollen?
+CREATE TABLE dvd_personen (
   produkt_nr integer,
   person_id integer,
-  rolle varchar,
+  rolle varchar(255),
   PRIMARY KEY (produkt_nr, person_id, rolle),
   FOREIGN KEY (produkt_nr) REFERENCES dvds (produkt_nr) ON DELETE CASCADE, -- ohne DVD keine Related Person
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE CASCADE, -- wenn die Person Weg ist, existiert das Produkt noch, sie haben nur nichts mehr miteinander zu tun
@@ -96,16 +96,16 @@ CREATE TABLE dvd_personen ( -- TODO aufteilen in die Rollen?
 
 CREATE TABLE kategorien (
     kategorie_id integer PRIMARY KEY,
-    name varchar UNIQUE NOT NULL
+    name varchar(255) UNIQUE NOT NULL
 );
 
-CREATE TABLE unterkategorie ( -- TODO: reicht nicht aus, da eine Kategorie eine oder mehrere Unterkategorien besitzen kann
+CREATE TABLE unterkategorie (
   kategorie_id integer,
   unterkategorie_id integer,
   PRIMARY KEY (kategorie_id, unterkategorie_id),
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
-  FOREIGN KEY (unterkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
-  -- TODO: CHECK kat 1 != kat 2
+  FOREIGN KEY (unterkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
+  CHECK (kategorie_id <> unterkategorie_id) -- da keine Kategorie sich selbst als Unterkategorie haben soll
 );
 
 CREATE TABLE produkt_kategorie (
@@ -115,45 +115,49 @@ CREATE TABLE produkt_kategorie (
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
-
-CREATE TABLE aehnliche_produkte ( -- um ähnliche Produkte zu einem Produkt zu finden muss das Produkt  in beiden spalten gesucht werden, die Ergebnisse addiert und Duplikate entfernt werden
+-- TODO: Symmetrie optimieren?
+CREATE TABLE aehnliche_produkte (
   produkt_nr1 integer,
   produkt_nr2 integer,
   PRIMARY KEY (produkt_nr1, produkt_nr2),
   FOREIGN KEY (produkt_nr1) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (produkt_nr2) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
-  -- TODO: CHECK das a-b nicht eingetragen wird, wenn b-a existiert
+  -- TODO: CHECK das a-b nicht eingetragen wird, wenn b-a existiert um Redundanz zu vermeiden + "um ähnliche Produkte zu einem Produkt zu finden muss das Produkt  in beiden spalten gesucht werden, die Ergebnisse addiert und Duplikate entfernt werden"
 );
 
 CREATE TABLE filialen (
   filiale_id integer PRIMARY KEY,
-  name varchar NOT NULL, -- nicht UNIQUE  wegen Franchises
-  anschrift varchar
+  name varchar(255) NOT NULL, -- nicht UNIQUE  wegen Franchises
+  adress_id int,
+  FOREIGN KEY (adress_id) REFERENCES adressen (adress_id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE
 );
 
 CREATE TABLE angebote (
   produkt_nr integer,
   filiale_id integer,
-  preis decimal, -- nicht NOT NULL wegen Rabatt/Aktionen etc.
-  zustand varchar, -- TODO: wie viele gibts? CHECK?
-  PRIMARY KEY (produkt_nr, filiale_id),
+  preis money, -- nicht NOT NULL wegen Rabatt/Aktionen etc.
+  zustand varchar(255),
+  PRIMARY KEY (produkt_nr, filiale_id, zustand),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
-  FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE CASCADE
+  FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE CASCADE,
+  CHECK  (zustand IN ('new', 'second-hand'))
 );
 
 CREATE TABLE adressen (
   adress_id int PRIMARY KEY,
-  straße varchar,
+  straße varchar(255),
   hausnummer int,
-  zusatz varchar,
+  zusatz varchar(255),
   plz int,
-  stadt varchar
+  stadt varchar(255)
 );
 
-CREATE TABLE kunden ( -- TODO: mit Personen verknüpfen ( auch wegen Name) // gefordert sind bei Kunden aber nur Anschrift und Kontonummer
-  person_id integer PRIMARY KEY,
+CREATE TABLE kunden (
+  person_id integer PRIMARY KEY, -- TODO: auf kunden_id ändern?
   adress_id int, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt // Limitation/Bedingung, dass eine Adresse zum Kauf vorhanden sein muss, muss von Software gechecked werden
-  kontonummer varchar NOT NULL,
+  kontonummer int NOT NULL,
   FOREIGN KEY (person_id)  REFERENCES personen (person_id) ON DELETE CASCADE,
   FOREIGN KEY (adress_id) REFERENCES adressen (adress_id) ON DELETE SET NULL
 );
@@ -162,16 +166,16 @@ CREATE TABLE kauf (
   kauf_id integer PRIMARY KEY,
   filiale_id integer, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt
   person_id integer, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt
-  kaufdatum timestamp NOT NULL, -- TODO: oder date? //// nicht automatisch vergeben
+  kaufdatum date NOT NULL, -- nicht automatisch vergeben (Systemtime)
   FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE SET NULL, -- der Kauf hat ja trotzdem stattgefunden
-  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL --  #MERLIN  vielleicht will man die Kaufdaten noch haben auch wenn man den Kunden nichtmehr zuordnen kann
+  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL-- #TODO: REF aus Kunden oder Personen //// vielleicht will man die Kaufdaten noch haben auch wenn man den Kunden nichtmehr zuordnen kann
 );
 
-CREATE TABLE kauf_produkt ( --anzahl hinzufügen?
+CREATE TABLE kauf_produkt (
   kauf_id integer,
   produkt_nr integer,
   anzahl integer NOT NULL DEFAULT 1,
-  einzelpreis decimal NOT NULL, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
+  einzelpreis money NOT NULL, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
   PRIMARY KEY (kauf_id, produkt_nr),
   FOREIGN KEY (kauf_id) REFERENCES kauf (kauf_id) ON DELETE CASCADE, -- es soll ja der gesamte Kauf gelöscht werden
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE SET NULL
@@ -181,8 +185,8 @@ CREATE TABLE rezensionen (
   rezension_id integer PRIMARY KEY,
   person_id integer NOT NULL,
   produkt_nr integer NOT NULL,
-  bewertung integer NOT NULL,
-  text varchar, -- TODO: oder varchar?
-  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL, -- #MERLIN Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
+  bewertung tinyint NOT NULL,
+  content text,
+  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL, -- #TODO: REF aus Kunden oder Personen //// Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE --ich brauche keine Rezension zu einem Produkt, dass ich nicht anbiete
 );

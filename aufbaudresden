@@ -1,7 +1,7 @@
 -   shop (name, street, zip)
     -   item (pgroup, asin, salesrank)
         -   title
-        -   price (state, mult, currency)
+        -   price (state, mult, currency) #-currency ist nur hinterlegt, wenn auch Preis hinterlegt ist
         -   ean
         -   details (img(link))
         -   listmania
