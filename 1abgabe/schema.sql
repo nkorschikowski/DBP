@@ -29,7 +29,7 @@ CREATE TABLE produkte (
   verkaufsrang integer UNIQUE, -- TODO: nach Ratings oder nach verkäufen? /// nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
   bild varchar(500),
   produkttyp varchar(255),
-   CHECK (rolle IN ('Book','Music','DVD'))
+   CHECK (produkttyp IN ('Book','Music','DVD'))
 );
 
 CREATE TABLE buecher (
@@ -45,7 +45,7 @@ CREATE TABLE dvds (
   produkt_nr integer PRIMARY KEY,
   format varchar(255),
   laufzeit time,
-  region_code tinyint, -- 0-8
+  region_code smallint,
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
 );
 
@@ -125,6 +125,15 @@ CREATE TABLE aehnliche_produkte (
   -- TODO: CHECK das a-b nicht eingetragen wird, wenn b-a existiert um Redundanz zu vermeiden + "um ähnliche Produkte zu einem Produkt zu finden muss das Produkt  in beiden spalten gesucht werden, die Ergebnisse addiert und Duplikate entfernt werden"
 );
 
+CREATE TABLE adressen (
+  adress_id int PRIMARY KEY,
+  straße varchar(255),
+  hausnummer int,
+  zusatz varchar(255),
+  plz int,
+  stadt varchar(255)
+);
+
 CREATE TABLE filialen (
   filiale_id integer PRIMARY KEY,
   name varchar(255) NOT NULL, -- nicht UNIQUE  wegen Franchises
@@ -145,15 +154,6 @@ CREATE TABLE angebote (
   CHECK  (zustand IN ('new', 'second-hand'))
 );
 
-CREATE TABLE adressen (
-  adress_id int PRIMARY KEY,
-  straße varchar(255),
-  hausnummer int,
-  zusatz varchar(255),
-  plz int,
-  stadt varchar(255)
-);
-
 CREATE TABLE kunden (
   person_id integer PRIMARY KEY, -- TODO: auf kunden_id ändern?
   adress_id int, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt // Limitation/Bedingung, dass eine Adresse zum Kauf vorhanden sein muss, muss von Software gechecked werden
@@ -168,7 +168,7 @@ CREATE TABLE kauf (
   person_id integer, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt
   kaufdatum date NOT NULL, -- nicht automatisch vergeben (Systemtime)
   FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE SET NULL, -- der Kauf hat ja trotzdem stattgefunden
-  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL-- #TODO: REF aus Kunden oder Personen //// vielleicht will man die Kaufdaten noch haben auch wenn man den Kunden nichtmehr zuordnen kann
+  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL -- vielleicht will man die Kaufdaten noch haben auch wenn man den Kunden nichtmehr zuordnen kann
 );
 
 CREATE TABLE kauf_produkt (
@@ -185,8 +185,8 @@ CREATE TABLE rezensionen (
   rezension_id integer PRIMARY KEY,
   person_id integer NOT NULL,
   produkt_nr integer NOT NULL,
-  bewertung tinyint NOT NULL,
+  bewertung smallint NOT NULL,
   content text,
-  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL, -- #TODO: REF aus Kunden oder Personen //// Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
+  FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL, -- Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE --ich brauche keine Rezension zu einem Produkt, dass ich nicht anbiete
 );
