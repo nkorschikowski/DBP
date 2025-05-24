@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS rezensionen CASCADE;
 
 
 CREATE TABLE produkte (
-  produkt_nr integer PRIMARY KEY,
+  produkt_nr varchar(255) PRIMARY KEY, -- asin
   titel varchar(255),
   rating float, -- TODO: muss noch nach jedem update erneuert werden
   verkaufsrang integer UNIQUE, -- TODO: nach Ratings oder nach verkäufen? /// nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
@@ -33,7 +33,7 @@ CREATE TABLE produkte (
 );
 
 CREATE TABLE buecher (
-  produkt_nr integer PRIMARY KEY,
+  produkt_nr varchar(255) PRIMARY KEY,
   seitenzahl integer,
   erscheinungsdatum date,
   isbn bigint UNIQUE NOT NULL, -- ISBN sollten eigentlich nur 10-Stellige Nummern sein (in der Datenbank aber auch Einträge mit einem 'X' am Ende gesehen => wahrscheinlich invalid)
@@ -42,7 +42,7 @@ CREATE TABLE buecher (
 );
 
 CREATE TABLE dvds (
-  produkt_nr integer PRIMARY KEY,
+  produkt_nr varchar(255) PRIMARY KEY,
   format varchar(255),
   laufzeit time,
   region_code smallint,
@@ -50,7 +50,7 @@ CREATE TABLE dvds (
 );
 
 CREATE TABLE musikcds (
-  produkt_nr integer PRIMARY KEY,
+  produkt_nr varchar(255) PRIMARY KEY,
   label varchar(255),
   erscheinungsdatum date,
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
@@ -59,7 +59,7 @@ CREATE TABLE musikcds (
 CREATE TABLE titel ( -- FEATURE: n:m tabelle machen (oder composite key?) für einfachere Abfrage "Auf welchen Alben finde ich das Lied Ocean von Peter" // kann ja auf mehreren sein ("Best of ...")
   titel_id integer PRIMARY KEY, -- weil Songs gleich heißen können
   name varchar(255),
-  produkt_nr integer UNIQUE NOT NULL,
+  produkt_nr varchar(255) UNIQUE NOT NULL,
   FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE
 );
 
@@ -69,7 +69,7 @@ CREATE TABLE personen (
 );
 
 CREATE TABLE autoren_buecher (
-  produkt_nr integer,
+  produkt_nr varchar(255),
   person_id integer,
   PRIMARY KEY (produkt_nr, person_id),
   FOREIGN KEY (produkt_nr) REFERENCES buecher (produkt_nr) ON DELETE CASCADE, -- ohne Buch kein Autor
@@ -77,7 +77,7 @@ CREATE TABLE autoren_buecher (
 );
 
 CREATE TABLE kuenstler_cds (
-  produkt_nr integer,
+  produkt_nr varchar(255),
   person_id integer,
   PRIMARY KEY (produkt_nr, person_id),
   FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE, -- ohne CD kein Künstler
@@ -85,7 +85,7 @@ CREATE TABLE kuenstler_cds (
 );
 
 CREATE TABLE dvd_personen (
-  produkt_nr integer,
+  produkt_nr varchar(255),
   person_id integer,
   rolle varchar(255),
   PRIMARY KEY (produkt_nr, person_id, rolle),
@@ -109,7 +109,7 @@ CREATE TABLE unterkategorie (
 );
 
 CREATE TABLE produkt_kategorie (
-  produkt_nr integer,
+  produkt_nr varchar(255),
   kategorie_id integer,
   PRIMARY KEY (produkt_nr, kategorie_id),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
@@ -117,8 +117,8 @@ CREATE TABLE produkt_kategorie (
 );
 -- TODO: Symmetrie optimieren?
 CREATE TABLE aehnliche_produkte (
-  produkt_nr1 integer,
-  produkt_nr2 integer,
+  produkt_nr1 varchar(255),
+  produkt_nr2 varchar(255),
   PRIMARY KEY (produkt_nr1, produkt_nr2),
   FOREIGN KEY (produkt_nr1) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (produkt_nr2) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
@@ -126,25 +126,25 @@ CREATE TABLE aehnliche_produkte (
 );
 
 CREATE TABLE adressen (
-  adress_id int PRIMARY KEY,
+  adress_id integer PRIMARY KEY,
   straße varchar(255),
-  hausnummer int,
+  hausnummer integer,
   zusatz varchar(255),
-  plz int,
+  plz integer,
   stadt varchar(255)
 );
 
 CREATE TABLE filialen (
   filiale_id integer PRIMARY KEY,
   name varchar(255) NOT NULL, -- nicht UNIQUE  wegen Franchises
-  adress_id int,
+  adress_id integer,
   FOREIGN KEY (adress_id) REFERENCES adressen (adress_id)
   ON DELETE SET NULL
   ON UPDATE CASCADE
 );
 
 CREATE TABLE angebote (
-  produkt_nr integer,
+  produkt_nr varchar(255),
   filiale_id integer,
   preis money, -- nicht NOT NULL wegen Rabatt/Aktionen etc.
   zustand varchar(255),
@@ -156,8 +156,8 @@ CREATE TABLE angebote (
 
 CREATE TABLE kunden (
   person_id integer PRIMARY KEY, -- TODO: auf kunden_id ändern?
-  adress_id int, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt // Limitation/Bedingung, dass eine Adresse zum Kauf vorhanden sein muss, muss von Software gechecked werden
-  kontonummer int NOT NULL,
+  adress_id integer, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt // Limitation/Bedingung, dass eine Adresse zum Kauf vorhanden sein muss, muss von Software gechecked werden
+  kontonummer integer NOT NULL,
   FOREIGN KEY (person_id)  REFERENCES personen (person_id) ON DELETE CASCADE,
   FOREIGN KEY (adress_id) REFERENCES adressen (adress_id) ON DELETE SET NULL
 );
@@ -173,7 +173,7 @@ CREATE TABLE kauf (
 
 CREATE TABLE kauf_produkt (
   kauf_id integer,
-  produkt_nr integer,
+  produkt_nr varchar(255),
   anzahl integer NOT NULL DEFAULT 1,
   einzelpreis money NOT NULL, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
   PRIMARY KEY (kauf_id, produkt_nr),
@@ -184,7 +184,7 @@ CREATE TABLE kauf_produkt (
 CREATE TABLE rezensionen (
   rezension_id integer PRIMARY KEY,
   person_id integer NOT NULL,
-  produkt_nr integer NOT NULL,
+  produkt_nr varchar(255) NOT NULL,
   bewertung smallint NOT NULL,
   content text,
   FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL, -- Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
