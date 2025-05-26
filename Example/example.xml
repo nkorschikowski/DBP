@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<example>\
+    <person>\
+        <id>5</id>\
+        <name>Ash</name>\
+        <age>17</age>\
+        <city>Dresden</city>\
+    </person>\
+    <person>\
+        <id>6</id>\
+        <name>Misty</name>\
+        <age>18</age>\
+        <city>Dresden</city>\
+    </person>\
+    <person>\
+        <id>7</id>\
+        <name>Rocko</name>\
+        <age>18</age>\
+        <city>Leipzig</city>\
+    </person>\
+    <person>\
+        <id>8</id>\
+        <name>Jake</name>\
+        <age>25</age>\
+        <city>Mainz</city>\
+    </person>\
+</example>
