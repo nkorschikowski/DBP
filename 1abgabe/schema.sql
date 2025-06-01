@@ -28,7 +28,8 @@ CREATE TABLE produkte (
   rating float, -- TODO: muss noch nach jedem update erneuert werden bei Abgabe 2
   verkaufsrang integer UNIQUE, -- nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
   bild varchar(500),
-  produkttyp varchar(255),
+  produkttyp varchar(255), -- TODO: NOT NULL?
+
   CHECK (produkttyp IN ('Book','Music','DVD'))
 );
 
@@ -91,6 +92,7 @@ CREATE TABLE dvd_personen (
   PRIMARY KEY (produkt_nr, person_id, rolle),
   FOREIGN KEY (produkt_nr) REFERENCES dvds (produkt_nr) ON DELETE CASCADE, -- ohne DVD keine Related Person
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE CASCADE, -- wenn die Person Weg ist, existiert das Produkt noch, sie haben nur nichts mehr miteinander zu tun
+
   CHECK (rolle IN ('Producer', 'Actor', 'Director'))
 );
 
@@ -98,6 +100,7 @@ CREATE TABLE kategorien (
     kategorie_id serial PRIMARY KEY,
     name varchar(255) UNIQUE NOT NULL
 );
+CREATE INDEX idx_kat_name ON kategorien(name); -- für WHERE
 
 CREATE TABLE unterkategorie (
   kategorie_id integer,
@@ -105,6 +108,7 @@ CREATE TABLE unterkategorie (
   PRIMARY KEY (kategorie_id, unterkategorie_id),
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
   FOREIGN KEY (unterkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
+
   CHECK (kategorie_id <> unterkategorie_id) -- da keine Kategorie sich selbst als Unterkategorie haben soll
 );
 
@@ -151,8 +155,10 @@ CREATE TABLE angebote (
   PRIMARY KEY (produkt_nr, filiale_id, zustand),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE CASCADE,
+
   CHECK  (zustand IN ('new', 'second-hand'))
 );
+CREATE INDEX idx_preis_id ON angebote(preis); -- für WHERE
 
 CREATE TABLE kunden (
   person_id integer PRIMARY KEY,
@@ -161,6 +167,7 @@ CREATE TABLE kunden (
   FOREIGN KEY (person_id)  REFERENCES personen (person_id) ON DELETE CASCADE,
   FOREIGN KEY (adress_id) REFERENCES adressen (adress_id) ON DELETE SET NULL
 );
+CREATE INDEX idx_adress_id ON kunden(adress_id); -- für FK JOIN
 
 CREATE TABLE kauf (
   kauf_id serial PRIMARY KEY,
@@ -170,6 +177,8 @@ CREATE TABLE kauf (
   FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE SET NULL, -- der Kauf hat ja trotzdem stattgefunden
   FOREIGN KEY (person_id) REFERENCES kunden (person_id) ON DELETE SET NULL -- vielleicht will man die Kaufdaten noch haben auch wenn man den Kunden nichtmehr zuordnen kann
 );
+CREATE INDEX idx_filiale_id ON kauf(filiale_id); -- für FK JOIN
+CREATE INDEX idx_kauf_person_id ON kauf(person_id); -- für FK JOIN
 
 CREATE TABLE kauf_produkt (
   kauf_id integer,
@@ -192,3 +201,5 @@ CREATE TABLE rezensionen (
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL, -- Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE --ich brauche keine Rezension zu einem Produkt, dass ich nicht anbiete
 );
+CREATE INDEX idx_renzension_person_id ON rezensionen(person_id); -- für FK JOIN
+CREATE INDEX idx_produkte_id ON rezensionen(produkt_nr); -- für FK JOIN
