@@ -191,15 +191,13 @@ CREATE TABLE kauf_produkt (
 );
 
 CREATE TABLE rezensionen (
-  rezension_id serial PRIMARY KEY,
   person_id integer NOT NULL,
   produkt_nr varchar(255) NOT NULL,
   date date,
   summary varchar(255) NOT NULL,
   bewertung smallint NOT NULL,
   content text,
+  PRIMARY KEY(person_id, produkt_nr),
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL, -- Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE --ich brauche keine Rezension zu einem Produkt, dass ich nicht anbiete
 );
-CREATE INDEX idx_renzension_person_id ON rezensionen(person_id); -- für FK JOIN
-CREATE INDEX idx_produkte_id ON rezensionen(produkt_nr); -- für FK JOIN
