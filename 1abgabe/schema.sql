@@ -25,11 +25,11 @@ DROP TABLE IF EXISTS rezensionen CASCADE;
 CREATE TABLE produkte (
   produkt_nr varchar(255) PRIMARY KEY, -- asin
   titel varchar(255),
-  rating float, -- TODO: muss noch nach jedem update erneuert werden
-  verkaufsrang integer UNIQUE, -- TODO: nach Ratings oder nach verkäufen? /// nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
+  rating float, -- TODO: muss noch nach jedem update erneuert werden bei Abgabe 2
+  verkaufsrang integer UNIQUE, -- nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
   bild varchar(500),
   produkttyp varchar(255),
-   CHECK (produkttyp IN ('Book','Music','DVD'))
+  CHECK (produkttyp IN ('Book','Music','DVD'))
 );
 
 CREATE TABLE buecher (
@@ -57,7 +57,7 @@ CREATE TABLE musikcds (
 );
 
 CREATE TABLE titel ( -- FEATURE: n:m tabelle machen (oder composite key?) für einfachere Abfrage "Auf welchen Alben finde ich das Lied Ocean von Peter" // kann ja auf mehreren sein ("Best of ...")
-  titel_id integer PRIMARY KEY, -- weil Songs gleich heißen können
+  titel_id serial PRIMARY KEY, -- weil Songs gleich heißen können
   name varchar(255),
   produkt_nr varchar(255) UNIQUE NOT NULL,
   FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE
@@ -95,7 +95,7 @@ CREATE TABLE dvd_personen (
 );
 
 CREATE TABLE kategorien (
-    kategorie_id integer PRIMARY KEY,
+    kategorie_id serial PRIMARY KEY,
     name varchar(255) UNIQUE NOT NULL
 );
 
@@ -126,7 +126,7 @@ CREATE TABLE aehnliche_produkte (
 );
 
 CREATE TABLE adressen (
-  adress_id integer PRIMARY KEY,
+  adress_id serial PRIMARY KEY,
   straße varchar(255),
   hausnummer integer,
   zusatz varchar(255),
@@ -135,7 +135,7 @@ CREATE TABLE adressen (
 );
 
 CREATE TABLE filialen (
-  filiale_id integer PRIMARY KEY,
+  filiale_id serial PRIMARY KEY,
   name varchar(255) NOT NULL, -- nicht UNIQUE  wegen Franchises
   adress_id integer,
   FOREIGN KEY (adress_id) REFERENCES adressen (adress_id)
@@ -155,7 +155,7 @@ CREATE TABLE angebote (
 );
 
 CREATE TABLE kunden (
-  person_id integer PRIMARY KEY, -- TODO: auf kunden_id ändern?
+  person_id integer PRIMARY KEY,
   adress_id integer, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt // Limitation/Bedingung, dass eine Adresse zum Kauf vorhanden sein muss, muss von Software gechecked werden
   kontonummer integer NOT NULL,
   FOREIGN KEY (person_id)  REFERENCES personen (person_id) ON DELETE CASCADE,
@@ -163,7 +163,7 @@ CREATE TABLE kunden (
 );
 
 CREATE TABLE kauf (
-  kauf_id integer PRIMARY KEY,
+  kauf_id serial PRIMARY KEY,
   filiale_id integer, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt
   person_id integer, -- nicht NOT NULL ist gewollt, siehe ON DELETEs // initial werden sie ja immer gesetzt
   kaufdatum date NOT NULL, -- nicht automatisch vergeben (Systemtime)
