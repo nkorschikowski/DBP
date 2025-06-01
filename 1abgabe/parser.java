@@ -1,6 +1,7 @@
 // kommentiertes Java-Ladeprogramm bzw. SQL Statements zur XML-Transformation
 // soll automatisch inkonsistente Datensätze ablehnen und in "abgelehnt.txt"
 // schreiben
+import java.beans.Statement;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,8 +12,10 @@ import java.sql.Connection;
 import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+//import java.sql.Statement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Time;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.*;
@@ -84,7 +87,9 @@ public class dynamicXML {
             String songTitle = null;
             
             //var for personen
+            String personen_key = null;
             String personenName = null;
+
 
             // var dvd_personen
             String rolle = null;
@@ -92,6 +97,10 @@ public class dynamicXML {
             // var similars
             String produkt_nr1=null;
             String produkt_nr2=null;
+
+            //SQL var
+            String sql = null;
+            PreparedStatement statement = conn.prepareStatement(sql);
 
             // Read XML file using StAX parser
             while (reader.hasNext()) {
@@ -124,10 +133,19 @@ public class dynamicXML {
                             adresse = str + ", " + zip;
                             System.out.println("Save var:" + shopName + ' ' + adresse);
                             System.out.println(); 
-                            //sql befehl insert into shop
-                            String sql = "INSERT INTO filialen (name, adresse) VALUES (?, ?)";
-                            PreparedStatement statement = conn.prepareStatement(sql);
-                            statement.setString(1, name);
+                            //sql befehl insert into adressen straße, hausnummer, zusatz, plz, stadt
+                            sql = "INSERT INTO adressen (straße, hausnummer, zusatz, plz, stadt) VALUES (?, ?, ?, ?, ?)";
+                            statement = conn.prepareStatement(sql);
+                            statement.setString(1, str);
+                            statement.setInt(2, 1);
+                            statement.setString(3, "");
+                            statement.setString(4, zip);
+                            statement.setString(5, shopName);
+                            statement.executeUpdate();  
+                            //sql befehl inset into filialen name, adresse
+                            sql = "INSERT INTO filialen (name, adresse) VALUES (?, ?)";
+                            statement = conn.prepareStatement(sql);
+                            statement.setString(1, shopName);
                             statement.setString(2, adresse);
                             statement.executeUpdate();  
                             break;
@@ -165,7 +183,18 @@ public class dynamicXML {
                             bild = (attr != null) ? attr.getValue() : "";
                             System.out.println("Save var:" + bild);
                             System.out.println();
-                            //sqlbefehl insert into produkte dresden
+                            //sqlbefehl insert into produkte titel, rating, verkaufsrang, bild, produkttyp dresden
+                            if (shopName.equals("Dresden")){
+                                sql = "INSERT INTO produkte (produkt_nr, titel, rating, verkaufsrang, bild, produkttyp) VALUES (?, ?, ?, ?, ?, ?)";
+                                statement = conn.prepareStatement(sql);
+                                statement.setString(1, produkt_nr);
+                                statement.setString(2, titel);
+                                statement.setFloat(3, rating);
+                                statement.setInt(4, verkaufsrang);
+                                statement.setString(5, bild);
+                                statement.setString(6, produkttyp);
+                                statement.executeUpdate(); 
+                            }
                             break;
 
                         case "title":
@@ -178,6 +207,17 @@ public class dynamicXML {
                             }
                             titel = sb.toString().trim();
                             //sql befehl insert into produkte leipzig
+                            if (shopName.equals("Leipzig")){
+                                sql = "INSERT INTO produkte (produkt_nr, titel, rating, verkaufsrang, bild, produkttyp) VALUES (?, ?, ?, ?, ?, ?)";
+                                statement = conn.prepareStatement(sql);
+                                statement.setString(1, produkt_nr);
+                                statement.setString(2, titel);
+                                statement.setFloat(3, rating);
+                                statement.setInt(4, verkaufsrang);
+                                statement.setString(5, bild);
+                                statement.setString(6, produkttyp);
+                                statement.executeUpdate(); 
+                            }
                             System.out.println("Save var:" + titel);
                             System.out.println();
                             break;
@@ -196,6 +236,11 @@ public class dynamicXML {
                                                 String title = event.asCharacters().getData().trim();
                                                 songTitle = title;
                                                 //sql befehl insert into title
+                                                sql = "INSERT INTO titel (titel, produkt_nr) VALUES (?, ?)";
+                                                statement = conn.prepareStatement(sql);
+                                                statement.setString(1, songTitle);
+                                                statement.setString(1, produkt_nr);
+                                                statement.executeUpdate(); 
                                                 System.out.println("Track title: " + title);
                                             }
                                         }
@@ -281,7 +326,15 @@ public class dynamicXML {
                                     System.err.println("Invalid time: " + sb.toString().trim());
                                 }
                             }
-                            //insert into dvds produkt_nr, format, laufzeit, regioncode
+                            //insert into dvds format, laufzeit, regioncode
+                            sql = "INSERT INTO dvds (produkt_nr, format, laufzeit, regioncode) VALUES (?, ?, ?, ?)";
+                            statement = conn.prepareStatement(sql);
+                            statement.setString(1, produkt_nr);
+                            statement.setString(2, songTitle);
+                            statement.setTime(3, Time.valueOf(laufzeit));
+                            statement.setInt(4, region_code);
+                            statement.executeUpdate(); 
+
                             System.out.println();
                             break;
 
@@ -301,7 +354,15 @@ public class dynamicXML {
                                     break;
                             }
 
-                            //sql befehl insert into buecher produkt_nr, seitenzahl, erscheinungsdatum, isbn, verlag
+                            //sql befehl insert into buecher seitenzahl, erscheinungsdatum, isbn, verlag
+                            sql = "INSERT INTO buecher (produkt_nr, seitenzahl, erscheinungsdatum, isbn, verlag) VALUES (?, ?, ?, ?, ?)";
+                            statement = conn.prepareStatement(sql);
+                            statement.setString(1, produkt_nr);
+                            statement.setInt(2, seitenzahl);
+                            statement.setDate(3, Date.valueOf(erscheinungsdatum));
+                            statement.setString(4, isbn);
+                            statement.setString(5, verlag);
+                            statement.executeUpdate(); 
                             verlag = sb.toString().trim();
                             System.out.println("Save var:" + verlag);
                             System.out.println();
@@ -328,7 +389,13 @@ public class dynamicXML {
                                 System.out.println();
                                 
                             }
-                            //sql befehl insert into musikcds produkt_nr, label, erscheindungsdatum
+                            //sql befehl insert into musikcds label, erscheindungsdatum
+                            sql = "INSERT INTO musikcds (produkt_nr, label, erscheindungsdatum) VALUES (?, ?, ?)";
+                            statement = conn.prepareStatement(sql);
+                            statement.setString(1, produkt_nr);
+                            statement.setString(2, label);
+                            statement.setDate(3, Date.valueOf(erscheinungsdatum));
+                            statement.executeUpdate();
                             break;
 
                         case "similars":
@@ -350,6 +417,11 @@ public class dynamicXML {
                                                 if (event.isCharacters()) {
                                                     produkt_nr2 = event.asCharacters().getData().trim();
                                                     //sql befehl insert into aehnliche_produkte produkt_nr1, produkt_nr2
+                                                    sql = "INSERT INTO musikcds (label, erscheindungsdatum) VALUES (?, ?)";
+                                                    statement = conn.prepareStatement(sql);
+                                                    statement.setString(1, produkt_nr1);
+                                                    statement.setString(2, produkt_nr2);
+                                                    statement.executeUpdate();
                                                     System.out.println("Save var: " + produkt_nr2);
                                                 }
                                             }
@@ -386,6 +458,11 @@ public class dynamicXML {
                                         attr = start.getAttributeByName(new QName("asin"));
                                         produkt_nr2 = (attr != null) ? attr.getValue() : "";
                                         //insert into aehnliche_produkte produkt_nr1, produkt_nr2
+                                        sql = "INSERT INTO musikcds (label, erscheindungsdatum) VALUES (?, ?)";
+                                        statement = conn.prepareStatement(sql);
+                                        statement.setString(1, produkt_nr1);
+                                        statement.setString(2, produkt_nr2);
+                                        statement.executeUpdate();
                                         System.out.println("Save var:" + produkt_nr1);
                                         System.out.println("Save var:" + produkt_nr2);
                                         System.out.println();
@@ -427,20 +504,46 @@ public class dynamicXML {
                                 }
                             }
                             //sql befehl insert into personen person_id, name
+                            sql = "INSERT INTO personen (name) VALUES (?)";
+                            statement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+                            statement.setString(1, personenName);
+                            statement.executeUpdate();
+                            ResultSet personKeys = statement.getGeneratedKeys();
+                            if (personKeys.next()) {
+                                personen_key = personKeys.getString(1);
+                            }                       
                             switch(tag) {
                                 case "actor": rolle = "Actor"; break;
                                 case "creator": rolle = "Producer"; break;
                                 case "director": rolle = "Director"; break;
                                 default: rolle = "";
-                                //sqlbefehl insert into dvd_personen produkt_nr, persone_id, rolle
+                                //sqlbefehl insert into dvd_personen produkt_nr, personen_id, rolle
+                                sql = "INSERT INTO dvd_personen (produkt_nr, person_id, rolle) VALUES (?, ?, ?)";
+                                statement = conn.prepareStatement(sql);
+                                statement.setString(1, produkt_nr);
+                                statement.setString(1, personen_key);
+                                statement.setString(1, rolle);
+                                statement.executeUpdate();
+                                statement.executeUpdate();
                             }
 
                             
                             if(tag.equals("author")){
                                 //sqlbefhel insert into autoren_buecher produkt_nr, person_id
+                                sql = "INSERT INTO autoren_buecher (produkr_nr, person_id) VALUES (?)";
+                                statement = conn.prepareStatement(sql);
+                                statement.setString(1, produkt_nr);
+                                statement.setString(1, personen_key);
+                                statement.executeUpdate();
                             }
                             if(tag.equals("artist")){
                                 //sqlbefehl insert into kuenstler_cds produkt_nr, person_id
+                                sql = "INSERT INTO kuenstler_cds (produkr_nr, person_id) VALUES (?)";
+                                statement = conn.prepareStatement(sql);
+                                statement.setString(1, produkt_nr);
+                                statement.setString(1, personen_key);
+                                statement.executeUpdate();
+                                statement.executeUpdate();
                             }
                             
                             System.out.println("Save var:" + personenName);
