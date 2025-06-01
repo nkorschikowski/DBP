@@ -116,6 +116,8 @@ public class CSVParser {
         String line = "";
 
         try {
+            reader = new BufferedReader(new FileReader(csvfilepath));
+
             // handle header
             String headerLine = reader.readLine();
 
