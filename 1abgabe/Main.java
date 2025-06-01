@@ -4,6 +4,6 @@
 public class Main {
     public static void main(String[] args) {
         CSVParser csvParser = new CSVParser();
-        csvParser.parse("data\\reviews.csv");
+        csvParser.parse("data\\shortreviews.csv");
     }
 }

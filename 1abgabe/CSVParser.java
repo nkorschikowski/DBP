@@ -19,10 +19,10 @@ public class CSVParser {
 
     Connection con = null;
 
-    public void parse(String filepath) {
+    public void parse(String csvfilepath) {
         loadProperties();
         makeConnection();
-        readCSV(filepath);
+        readCSV(csvfilepath);
     }
 
     private void loadProperties() {
@@ -139,6 +139,17 @@ public class CSVParser {
                 int personid = checkForPerson(data[4]);
                 if (personid == 0) {
                     parsePerson(personid, data[4]);
+                    // setzte personid auf die id der gerade geparsten Person
+                    String checkForPerson = "SELECT person_id FROM personen WHERE name = ?";
+                    try (PreparedStatement checkStmt = con.prepareStatement(checkForPerson)) {
+                        checkStmt.setString(1, name);
+                        ResultSet rs = checkStmt.executeQuery();
+                        if (rs.next()) {
+                            personid = rs.getInt("person_id");
+                        }
+                    } catch (SQLException sqle) {
+                        sqle.printStackTrace();
+                    }
                 }
 
                 parseReview(data, personid);
