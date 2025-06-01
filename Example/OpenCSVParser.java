@@ -1,3 +1,5 @@
+package Example;
+
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +13,23 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class CSVParser {
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+
+//         try (CSVReader reader = new CSVReader(new FileReader("data.csv"))) {
+//             String[] nextLine;
+//             while ((nextLine = reader.readNext()) != null) {
+//                 System.out.println("Product: " + nextLine[0]);
+//                 System.out.println("Rating: " + nextLine[1]);
+//                 System.out.println("Summary: " + nextLine[5]);
+//                 System.out.println("Content: " + nextLine[6]);
+//                 System.out.println("-----------");
+//             }
+//         } catch (IOException e) {
+//             e.printStackTrace();
+//         }
+
+public class OpenCSVParser {
 
     String url = null;
     String name = null;
@@ -93,10 +111,9 @@ public class CSVParser {
         // String user = data[4];
         // String summary = data[5];
         // String content = data[6];
-        // // for (int i = 0; i < data.length; i++) {
-        // // data[i] = data[i].replaceAll("^\"|\"$", ""); // remove leading and
-        // trailing quotes
-        // // }
+        for (int i = 0; i < data.length; i++) {
+            data[i] = data[i].replaceAll("^\"|\"$", ""); // remove leading and trailing quotes
+        }
 
         try {
             PreparedStatement statement = con.prepareStatement(insert_review);
@@ -118,31 +135,24 @@ public class CSVParser {
 
     private void readCSV(String csvfilepath) {
         // Read csv
-        BufferedReader reader = null;
-        String line = "";
-        try {
-            reader = new BufferedReader(new FileReader(csvfilepath));
+        try (CSVReader reader = new CSVReader(new FileReader(csvfilepath))) {
+            String[] data;
 
-            // handle header
-            String headerLine = reader.readLine();
+            while ((data = reader.readNext()) != null) {
+                System.out.println("product: " + data[0]);
+                System.out.println("rating: " + data[1]);
+                System.out.println("helpful: " + data[2]);
+                System.out.println("reviewdate: " + data[3]);
+                System.out.println("user: " + data[4]);
+                System.out.println("summary: " + data[5]);
+                System.out.println("content: " + data[6]);
+                System.out.println("-----------");
 
-            while ((line = reader.readLine()) != null) {
-                // erase first an last \"
-                line = line.substring(1, line.length() - 1);
-
-                String[] data = line.split("\",\"", -1);
-
-                // String product = data[0];
-                // int rating = data[1];
-                // int helpful = data[2];
-                // String reviewdate = data[3];
-                // String user = data[4];
-                // String summary = data[5];
-                // String content = data[6];
-
+                // Parse die Person, wenn nötig (da FK)
                 int personid = checkForPerson(data[4]);
                 if (personid == 0) {
                     parsePerson(personid, data[4]);
+
                     // setzte personid auf die id der gerade geparsten Person
                     String checkForPerson = "SELECT person_id FROM personen WHERE name = ?";
                     try (PreparedStatement checkStmt = con.prepareStatement(checkForPerson)) {
@@ -156,37 +166,11 @@ public class CSVParser {
                     }
                 }
 
+                // parse die Rezension
                 parseReview(data, personid);
-
-                // insert person
-
-                // person exists
-                // person does not exist
-
-                // insert review
-                // get person_id
-
             }
-        } catch (FileNotFoundException fnfe) {
-            fnfe.printStackTrace();
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
+        } catch (IOException | CsvValidationException e) {
+            e.printStackTrace();
         }
     }
 }
-
-// try {
-// PreparedStatement statement = con.prepareStatement(insert_review);
-// int id = Integer.parseInt(data[0]);
-// String names = data[1];
-// int age = Integer.parseInt(data[2]);
-// String city = data.length == 4 ? data[3] : "";
-// statement.setInt(1, id);
-// statement.setString(2, names);
-// statement.setInt(3, age);
-// statement.setString(4, city);
-// statement.executeUpdate();
-
-// } catch(SQLException sqle) {
-// sqle.printStackTrace();
-// }
