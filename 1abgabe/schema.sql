@@ -28,7 +28,7 @@ CREATE TABLE produkte (
   rating float, -- TODO: muss noch nach jedem update erneuert werden bei Abgabe 2
   verkaufsrang integer UNIQUE, -- nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
   bild varchar(500),
-  produkttyp varchar(255), -- TODO: NOT NULL?
+  produkttyp varchar(255),
 
   CHECK (produkttyp IN ('Book','Music','DVD'))
 );
@@ -119,14 +119,16 @@ CREATE TABLE produkt_kategorie (
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
--- TODO: Symmetrie optimieren?
+
 CREATE TABLE aehnliche_produkte (
   produkt_nr1 varchar(255),
   produkt_nr2 varchar(255),
   PRIMARY KEY (produkt_nr1, produkt_nr2),
   FOREIGN KEY (produkt_nr1) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
-  FOREIGN KEY (produkt_nr2) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
-  -- TODO: CHECK das a-b nicht eingetragen wird, wenn b-a existiert um Redundanz zu vermeiden + "um ähnliche Produkte zu einem Produkt zu finden muss das Produkt  in beiden spalten gesucht werden, die Ergebnisse addiert und Duplikate entfernt werden"
+  FOREIGN KEY (produkt_nr2) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
+
+  CHECK (produkt_nr1 < produkt_nr2)
+  --- "um ähnliche Produkte zu einem Produkt zu finden muss das Produkt  in beiden spalten gesucht werden, die Ergebnisse addiert und Duplikate entfernt werden"
 );
 
 CREATE TABLE adressen (

@@ -10,6 +10,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class CSVParser {
 
@@ -20,9 +23,12 @@ public class CSVParser {
     Connection con = null;
 
     public void parse(String csvfilepath) {
+
         loadProperties();
         makeConnection();
         readCSV(csvfilepath);
+
+        System.out.println("finished CSV Import");
     }
 
     private void loadProperties() {
@@ -33,8 +39,8 @@ public class CSVParser {
         try {
             FileInputStream fis = new FileInputStream(filepath);
             props.load(fis);
-        } catch (IOException g) {
-            System.out.println("Inputsream Exception (with properties file):" + g);
+        } catch (IOException ioe) {
+            System.out.println("Inputsream Exception (with properties file):" + ioe);
         }
         url = props.getProperty("url");
         name = props.getProperty("name");
@@ -86,17 +92,6 @@ public class CSVParser {
 
     private void parseReview(String[] data, int person_id) {
         String insert_review = "INSERT INTO rezensionen (person_id, produkt_nr, date, summary, bewertung, content) VALUES (?, ?, ?, ?, ?, ?)";
-        // String product = data[0];
-        // int rating = data[1];
-        // int helpful = data[2];
-        // String reviewdate = data[3];
-        // String user = data[4];
-        // String summary = data[5];
-        // String content = data[6];
-        // // for (int i = 0; i < data.length; i++) {
-        // // data[i] = data[i].replaceAll("^\"|\"$", ""); // remove leading and
-        // trailing quotes
-        // // }
 
         try {
             PreparedStatement statement = con.prepareStatement(insert_review);
@@ -111,18 +106,16 @@ public class CSVParser {
             statement.executeUpdate();
 
         } catch (SQLException sqle) {
-            sqle.printStackTrace();
+            logdeny(data[0], sqle);
         }
-
     }
 
     private void readCSV(String csvfilepath) {
         // Read csv
         BufferedReader reader = null;
         String line = "";
-        try {
-            reader = new BufferedReader(new FileReader(csvfilepath));
 
+        try {
             // handle header
             String headerLine = reader.readLine();
 
@@ -131,14 +124,6 @@ public class CSVParser {
                 line = line.substring(1, line.length() - 1);
 
                 String[] data = line.split("\",\"", -1);
-
-                // String product = data[0];
-                // int rating = data[1];
-                // int helpful = data[2];
-                // String reviewdate = data[3];
-                // String user = data[4];
-                // String summary = data[5];
-                // String content = data[6];
 
                 int personid = checkForPerson(data[4]);
                 if (personid == 0) {
@@ -157,15 +142,6 @@ public class CSVParser {
                 }
 
                 parseReview(data, personid);
-
-                // insert person
-
-                // person exists
-                // person does not exist
-
-                // insert review
-                // get person_id
-
             }
         } catch (FileNotFoundException fnfe) {
             fnfe.printStackTrace();
@@ -173,20 +149,13 @@ public class CSVParser {
             ioe.printStackTrace();
         }
     }
+
+    void logdeny(String produkt_nr, SQLException e) {
+        try (FileWriter log = new FileWriter("CSVabgelehnt.txt", true)) {
+            log.write("Failed to Insert review of Produkt \"" + produkt_nr + "\"\n");
+            log.write("SQL Error: " + e.getMessage() + "\n ------------ \n");
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+    }
 }
-
-// try {
-// PreparedStatement statement = con.prepareStatement(insert_review);
-// int id = Integer.parseInt(data[0]);
-// String names = data[1];
-// int age = Integer.parseInt(data[2]);
-// String city = data.length == 4 ? data[3] : "";
-// statement.setInt(1, id);
-// statement.setString(2, names);
-// statement.setInt(3, age);
-// statement.setString(4, city);
-// statement.executeUpdate();
-
-// } catch(SQLException sqle) {
-// sqle.printStackTrace();
-// }
