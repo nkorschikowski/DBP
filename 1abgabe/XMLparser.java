@@ -32,25 +32,32 @@ import javax.xml.stream.events.XMLEvent;
 class XMLparser {
     // Cache for table columns to avoid repeated DB queries
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) throws Exception {Add commentMore actions
         String xmlDresden = "dresden.xml"; //inputfile static
         String xmlLeipzig = "leipzig_transformed.xml";
         
         //load server credentials
+    public void parse(String filepath) throws Exception {
+        String xmlpath = filepath; // inputfile static
+
+        // load server credentials
         Properties props = new Properties();
         String filepath = "my.properties";
          try {
             FileInputStream fis = new FileInputStream(filepath);
+        String propfilepath = "1abgabe\\my.properties";
+        try {
+            FileInputStream fis = new FileInputStream(propfilepath);
             props.load(fis);
         } catch (IOException g) {
             System.out.println("Inputsream Excaption:" + g);
-        }
-
+    public static void main(String[] args) throws Exception {
         String url = props.getProperty("url");
         String name = props.getProperty("name");
         String password = props.getProperty("password");
         insertData(url,name,password,xmlDresden);
         insertData(url,name,password,xmlLeipzig);
+        insertData(url, name, password, xmlpath);
         System.out.println("Data inserted to database");
     }
 
