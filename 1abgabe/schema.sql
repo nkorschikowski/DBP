@@ -23,8 +23,8 @@ DROP TABLE IF EXISTS rezensionen CASCADE;
 
 
 CREATE TABLE produkte (
-  produkt_nr varchar(255) PRIMARY KEY, -- asin -- TODO: on update cascede einfügen bei tabellen
-  titel varchar(255), -- TODO: NOT NULL
+  produkt_nr varchar(255) PRIMARY KEY, -- asin
+  titel varchar(255) NOT NULL,
   rating float, -- TODO: muss noch nach jedem update erneuert werden bei Abgabe 2
   verkaufsrang integer UNIQUE, -- nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
   bild varchar(500),
@@ -39,7 +39,9 @@ CREATE TABLE buecher (
   erscheinungsdatum date,
   isbn bigint UNIQUE NOT NULL, -- ISBN sollten eigentlich nur 10-Stellige Nummern sein (in der Datenbank aber auch Einträge mit einem 'X' am Ende gesehen => wahrscheinlich invalid)
   verlag varchar(255),
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
+  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
 );
 
 CREATE TABLE dvds (
@@ -47,33 +49,41 @@ CREATE TABLE dvds (
   format varchar(255),
   laufzeit time,
   region_code smallint,
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
+  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
 );
 
 CREATE TABLE musikcds (
   produkt_nr varchar(255) PRIMARY KEY,
   label varchar(255),
   erscheinungsdatum date,
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE
+  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
 );
 
 CREATE TABLE titel ( -- FEATURE: n:m tabelle machen (oder composite key?) für einfachere Abfrage "Auf welchen Alben finde ich das Lied Ocean von Peter" // kann ja auf mehreren sein ("Best of ...")
   titel_id serial PRIMARY KEY, -- weil Songs gleich heißen können
   name varchar(255),
   produkt_nr varchar(255) UNIQUE NOT NULL,
-  FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE
+  FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE
 );
 
-CREATE TABLE personen ( -- TODO: checken, dass beim parsen eine Person nicht mehrfach eingetragen wird
+CREATE TABLE personen (
   person_id serial PRIMARY KEY,
-  name varchar(255) NOT NULL -- TODO: unique machen wegen parsen, zwar unschön, aber in unserem Szenario eine akzeptable annahme
+  name varchar(255) UNIQUE NOT NULL -- UNIQUE ist zwar unschön aber in unserem Szenario wohl eine akzeptable Annahme (lt. Konsultation 1. Abgabe)
 );
 
 CREATE TABLE autoren_buecher (
   produkt_nr varchar(255),
   person_id integer,
   PRIMARY KEY (produkt_nr, person_id),
-  FOREIGN KEY (produkt_nr) REFERENCES buecher (produkt_nr) ON DELETE CASCADE, -- ohne Buch kein Autor
+  FOREIGN KEY (produkt_nr) REFERENCES buecher (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE, -- ohne Buch kein Autor
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE CASCADE -- wenn die Person Weg ist, existiert das Produkt noch, sie haben nur nichts mehr miteinander zu tun
 );
 
@@ -81,7 +91,9 @@ CREATE TABLE kuenstler_cds (
   produkt_nr varchar(255),
   person_id integer,
   PRIMARY KEY (produkt_nr, person_id),
-  FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr) ON DELETE CASCADE, -- ohne CD kein Künstler
+  FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE, -- ohne CD kein Künstler
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE CASCADE -- wenn die Person Weg ist, existiert das Produkt noch, sie haben nur nichts mehr miteinander zu tun
 );
 
@@ -90,33 +102,30 @@ CREATE TABLE dvd_personen (
   person_id integer,
   rolle varchar(255),
   PRIMARY KEY (produkt_nr, person_id, rolle),
-  FOREIGN KEY (produkt_nr) REFERENCES dvds (produkt_nr) ON DELETE CASCADE, -- ohne DVD keine Related Person
+  FOREIGN KEY (produkt_nr) REFERENCES dvds (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE, -- ohne DVD keine Related Person
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE CASCADE, -- wenn die Person Weg ist, existiert das Produkt noch, sie haben nur nichts mehr miteinander zu tun
 
   CHECK (rolle IN ('Producer', 'Actor', 'Director'))
 );
 
-CREATE TABLE kategorien ( -- TODO: oberkategorie rein
+CREATE TABLE kategorien ( -- 'Romcom' darf nicht Unterkategorie von 'Romantik' UND 'Comedy' sein
     kategorie_id serial PRIMARY KEY,
-    name varchar(255) UNIQUE NOT NULL -- TODO: UNIQUE weg:Muss mehrmals vorhand sein (Oberbekleidung gibt es für Männer und Frauen)
+    name varchar(255) NOT NULL, -- nicht UNIQUE weil z.Bsp.(analog): 'Oberbekleidung' kann unterkategorie von 'Herrenmode' und 'Damenmode' sein (hießt gleich, ist was anderes)
+    oberkategorie_id integer,
+    FOREIGN KEY (oberkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
+    CHECK (kategorie_id <> oberkategorie_id) -- da keine Kategorie sich selbst als Unterkategorie haben soll
 );
 CREATE INDEX idx_kat_name ON kategorien(name); -- für WHERE
-
-CREATE TABLE unterkategorie ( -- TODO: weg
-  kategorie_id integer,
-  unterkategorie_id integer,
-  PRIMARY KEY (kategorie_id, unterkategorie_id),
-  FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
-  FOREIGN KEY (unterkategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE,
-
-  CHECK (kategorie_id <> unterkategorie_id) -- da keine Kategorie sich selbst als Unterkategorie haben soll
-);
 
 CREATE TABLE produkt_kategorie (
   produkt_nr varchar(255),
   kategorie_id integer,
   PRIMARY KEY (produkt_nr, kategorie_id),
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
+  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (kategorie_id) REFERENCES kategorien (kategorie_id) ON DELETE CASCADE
 );
 
@@ -150,12 +159,14 @@ CREATE TABLE filialen (
 );
 
 CREATE TABLE angebote (
-  produkt_nr varchar(255),
+  produkt_nr varchar(255) UNIQUE, -- UNIQUE: eigentlich obsolet, da es ein FK ist und produkt_nr in produkte PK, aber es gab sonst probleme bei kauf_produkt weil es hier nicht UNIQUE sei
   filiale_id integer,
   preis money, -- nicht NOT NULL wegen Rabatt/Aktionen etc.
   zustand varchar(255),
   PRIMARY KEY (produkt_nr, filiale_id, zustand),
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE,
+  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE,
   FOREIGN KEY (filiale_id) REFERENCES filialen (filiale_id) ON DELETE CASCADE,
 
   CHECK  (zustand IN ('new', 'second-hand'))
@@ -182,14 +193,16 @@ CREATE TABLE kauf (
 CREATE INDEX idx_filiale_id ON kauf(filiale_id); -- für FK JOIN
 CREATE INDEX idx_kauf_person_id ON kauf(person_id); -- für FK JOIN
 
-CREATE TABLE kauf_produkt ( -- TODO: OPT1 Zustand mit eingfügen
+CREATE TABLE kauf_produkt (
   kauf_id integer,
   produkt_nr varchar(255),
   anzahl integer NOT NULL DEFAULT 1,
   einzelpreis money NOT NULL, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
   PRIMARY KEY (kauf_id, produkt_nr),
   FOREIGN KEY (kauf_id) REFERENCES kauf (kauf_id) ON DELETE CASCADE, -- es soll ja der gesamte Kauf gelöscht werden
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE SET NULL -- TODO: Opts id bei angebote einfügen und die refferenzieren
+  FOREIGN KEY (produkt_nr) REFERENCES angebote (produkt_nr)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE
 );
 
 CREATE TABLE rezensionen (
@@ -197,9 +210,13 @@ CREATE TABLE rezensionen (
   produkt_nr varchar(255) NOT NULL,
   date date,
   summary varchar(255) NOT NULL,
-   bewertung smallint NOT NULL, -- TODO: Check 0-5 Sterne oder 1-5?
+  bewertung smallint NOT NULL,
   content text,
   PRIMARY KEY(person_id, produkt_nr),
   FOREIGN KEY (person_id) REFERENCES personen (person_id) ON DELETE SET NULL, -- Rezension wurde ja getätigt, nur weil ein Kunde aus der Datenbank gelöscht wird, sollte dies ja keine Auswirkung auf das Ranking haben
-  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr) ON DELETE CASCADE --ich brauche keine Rezension zu einem Produkt, dass ich nicht anbiete
+  FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
+  ON DELETE CASCADE
+  ON UPDATE CASCADE, --ich brauche keine Rezension zu einem Produkt, dass ich nicht anbiete
+
+  CHECK  (bewertung BETWEEN 1 AND 5)
 );
