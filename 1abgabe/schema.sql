@@ -25,7 +25,7 @@ DROP TABLE IF EXISTS rezensionen CASCADE;
 CREATE TABLE produkte (
   produkt_nr varchar(255) PRIMARY KEY, -- asin
   titel varchar(255) NOT NULL,
-  rating float, -- TODO: muss noch nach jedem update erneuert werden bei Abgabe 2
+  rating float, -- wird durch TRIGGER bei INSERT, UPDATE, DELETE in 'rezensionen' aktualisiert
   verkaufsrang integer UNIQUE, -- nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
   bild varchar(500),
   produkttyp varchar(255),
@@ -220,3 +220,42 @@ CREATE TABLE rezensionen (
 
   CHECK  (bewertung BETWEEN 1 AND 5)
 );
+
+CREATE OR REPLACE FUNCTION update_rating()
+  RETURNS TRIGGER AS $$
+  BEGIN
+    UPDATE produkte
+    SET rating = (
+      SELECT AVG(bewertung)
+      FROM rezensionen
+      WHERE produkt_nr = NEW.produkt_nr
+    )
+    WHERE produkt_nr = NEW.produkt_nr;
+    RETURN NEW;
+  END;
+  $$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE FUNCTION update_rating_del()
+  RETURNS TRIGGER AS $$
+  BEGIN
+    UPDATE produkte
+    SET rating = (
+      SELECT AVG(bewertung)
+      FROM rezensionen
+      WHERE produkt_nr = OLD.produkt_nr
+    )
+    WHERE produkt_nr = OLD.produkt_nr;
+    RETURN OLD;
+  END;
+  $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE TRIGGER update_rating_trigger AFTER INSERT OR UPDATE
+  ON rezensionen
+  FOR EACH ROW
+  EXECUTE FUNCTION update_rating();
+
+CREATE OR REPLACE TRIGGER update_rating_del_trigger AFTER DELETE
+  ON rezensionen
+  FOR EACH ROW
+  EXECUTE FUNCTION update_rating_del();
