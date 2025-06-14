@@ -158,12 +158,12 @@ CREATE TABLE filialen (
   ON UPDATE CASCADE
 );
 
-CREATE TABLE angebote (
-  produkt_nr varchar(255) UNIQUE, -- UNIQUE: eigentlich obsolet, da es ein FK ist und produkt_nr in produkte PK, aber es gab sonst probleme bei kauf_produkt weil es hier nicht UNIQUE sei
+CREATE TABLE angebote ( -- angebot_id statt Composite Key(produkt/filiale/zustand), weil sonst die drei Values redundant in kauf_produkt benötigt werden würden um es eindeutig zu FK-refferenzieren + richtig bescheiden für Queries
+  angebot_id serial PRIMARY KEY,
+  produkt_nr varchar(255),
   filiale_id integer,
   preis money, -- nicht NOT NULL wegen Rabatt/Aktionen etc.
   zustand varchar(255),
-  PRIMARY KEY (produkt_nr, filiale_id, zustand),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
   ON DELETE CASCADE
   ON UPDATE CASCADE,
@@ -195,12 +195,12 @@ CREATE INDEX idx_kauf_person_id ON kauf(person_id); -- für FK JOIN
 
 CREATE TABLE kauf_produkt (
   kauf_id integer,
-  produkt_nr varchar(255),
+  angebot_id integer,
   anzahl integer NOT NULL DEFAULT 1,
   einzelpreis money NOT NULL, -- muss gesetzt werden, da das eine Zeitaufnahme ist und sich das Angebot ja ändern kann
-  PRIMARY KEY (kauf_id, produkt_nr),
+  PRIMARY KEY (kauf_id, angebot_id),
   FOREIGN KEY (kauf_id) REFERENCES kauf (kauf_id) ON DELETE CASCADE, -- es soll ja der gesamte Kauf gelöscht werden
-  FOREIGN KEY (produkt_nr) REFERENCES angebote (produkt_nr)
+  FOREIGN KEY (angebot_id) REFERENCES angebote (angebot_id)
   ON DELETE SET NULL
   ON UPDATE CASCADE
 );
