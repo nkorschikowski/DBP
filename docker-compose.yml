@@ -1,0 +1,20 @@
+# Postgres Datenbank über Container mit angebundenem Volume
+services:
+  db: # freier name für den Service
+    image: postgres # :<Version> ist besser, weil sonst bei update neue Version gezogen wird und evtl Dependency Probleme auslöst
+ #  image: postgres # würde auch 'latest' ziehen
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: tester
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    ports:
+      - "5433:5432" # port 5432 der Maschine wird auf Port 5432 des Containers gemapped
+    volumes:
+      - postgres_daten:/var/lib/postgresql/data # gibt an wo Docker das Volume anlegen soll
+    restart: always  # sollte der container stoppen, wird er automatisch neu gestartet (wahrscheinlich für Porduction)
+    # set shared memory limit when using docker compose
+
+volumes:
+  postgres_daten: # ist quasi variable für das Volume
+    # hier könnte man b´mount noch etwas spezifizieren
