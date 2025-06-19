@@ -37,7 +37,7 @@ CREATE TABLE buecher (
   produkt_nr varchar(255) PRIMARY KEY,
   seitenzahl integer,
   erscheinungsdatum date,
-  isbn bigint UNIQUE NOT NULL, -- ISBN sollten eigentlich nur 10-Stellige Nummern sein (in der Datenbank aber auch Einträge mit einem 'X' am Ende gesehen => wahrscheinlich invalid)
+  isbn varchar(255), -- isbn kann auch mit 0  beginnen daher char -- ISBN sollten eigentlich nur 10-Stellige Nummern sein (in der Datenbank aber auch Einträge mit einem 'X' am Ende gesehen => wahrscheinlich invalid)
   verlag varchar(255),
   FOREIGN KEY (produkt_nr) REFERENCES produkte (produkt_nr)
   ON DELETE CASCADE
@@ -143,9 +143,9 @@ CREATE TABLE aehnliche_produkte (
 CREATE TABLE adressen (
   adress_id serial PRIMARY KEY,
   straße varchar(255),
-  hausnummer integer,
+  hausnummer varchar(255), -- BSP 11a kann nict als integer abgezeichnet werden also hier string
   zusatz varchar(255),
-  plz integer,
+  plz varchar(255), -- 0400 für Sachsen kann nur als string mit vorangestellter null repräsentiert werden
   stadt varchar(255)
 );
 
