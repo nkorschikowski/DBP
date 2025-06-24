@@ -25,6 +25,13 @@ def insertCategories(conn, soup, okat):
             # items einfügen
             # insertItemKategorie(conn, produkt_nr, kategorie_id)
             print("Oberkategory stripped: " + kat.contents[0].strip('\n'))
+            print("Kategorie: ")
+            print(kategorie)
+            print(okat_id)
+            items = kat.find_all('item', recursive=False)
+            for _ in items:
+                print('item: ')
+                print(_)
         else:
             # Standard-Fall: einfügen in DB kategorie, oberkategorie -> dann Rekursionsaufruf
             # Einfügen auf dem Rückweg schlecht
@@ -32,6 +39,11 @@ def insertCategories(conn, soup, okat):
             kategorie = kat.contents[0].strip('\n')
             oberkategorie_id = soup.contents[0].strip('\n')
             okat_id = insertKategorie(conn, kategorie, okat)
+            items = kat.find_all('item', recursive=False)
+
+            for _ in items:
+                item_id= _.contents[0]
+                insertItem(conn, item_id, okat_id)
             # items einfügen
             # insertItemKategorie(conn, produkt_nr, kategorie_id)
             
@@ -39,10 +51,10 @@ def insertCategories(conn, soup, okat):
             #print('_____-----______----_____---____---')
         #insertbefehl sql
         #insertKategorie(conn, kategorie, oberkategorie_id)
-        print('okat_ID: ' + str(okat_id))
-        print('Kategorie: ' + kategorie + ' | | Oberkategorie: ' + str(oberkategorie_id))
+        print('Kategorie: ' + kategorie + ' | | Oberkategorie: ' + str(oberkategorie_id) + ' | | Oberkategorie: ' + str(okat))
         print('_____-----______----_____---____---')
         insertCategories(conn, kat, okat_id)
+
 
 def insertKategorie(conn, kategorie, oberkategorie):
     #insert category into database
@@ -69,6 +81,22 @@ def insertKategorie(conn, kategorie, oberkategorie):
 # encoding aus dem dateiheader abgelesen
 # verwendern von beautiful soup weil sie einfach schöner ist
 
+def insertItem(conn, item_id, kategorie_id):
+    #insert category into database
+    #if not duplicate_category:
+    try:
+        insert_query = "INSERT INTO produkt_kategorie (produkt_nr, kategorie_id) VALUES (%s, %s);"
+        cur = conn.cursor()
+        cur.execute(insert_query, (item_id, kategorie_id,))
+        conn.commit()
+        print('Inserted Item: ')
+        print(item_id)
+        print('To Category: ')
+        print(kategorie_id)
+    except Exception as error:
+        print ("Oh dang. Insetion @Item exception:", error)
+        print ("Exception TYPE:", type(error))
+    #insert items into database
 kategorien = "/Users/merlin/Downloads/media_store_project/1abgabe/categories.xml"
 file_kat = open(kategorien, 'r', encoding="latin1")
 content_kat = file_kat.read()
