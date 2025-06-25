@@ -81,23 +81,36 @@ def insertKategorie(conn, kategorie, oberkategorie):
 # encoding aus dem dateiheader abgelesen
 # verwendern von beautiful soup weil sie einfach schöner ist
 
+
 def insertItem(conn, item_id, kategorie_id):
-    #insert category into database
-    #if not duplicate_category:
     try:
-        insert_query = "INSERT INTO produkt_kategorie (produkt_nr, kategorie_id) VALUES (%s, %s);"
         cur = conn.cursor()
+
+        # Check if item_id (produkt_nr) exists in produkte table
+        cur.execute("SELECT 1 FROM produkte WHERE produkt_nr = %s;", (item_id,))
+        if cur.fetchone() is None:
+            # Write error to file if produkt_nr doesn't exist
+            with open("error.txt", "a") as error_file:
+                error_file.write(f"Error: produkt_nr {item_id} not found in 'produkte' table. Skipping insert.\n")
+            print(f"produkt_nr {item_id} not found. Skipping insert.")
+            return  # Exit the function
+
+        # Proceed with insertion into produkt_kategorie
+        insert_query = "INSERT INTO produkt_kategorie (produkt_nr, kategorie_id) VALUES (%s, %s);"
         cur.execute(insert_query, (item_id, kategorie_id,))
         conn.commit()
-        print('Inserted Item: ')
-        print(item_id)
-        print('To Category: ')
-        print(kategorie_id)
+        print('Inserted Item:', item_id)
+        print('To Category:', kategorie_id)
+
     except Exception as error:
-        print ("Oh dang. Insetion @Item exception:", error)
-        print ("Exception TYPE:", type(error))
-    #insert items into database
-kategorien = "/Users/merlin/Downloads/media_store_project/1abgabe/categories.xml"
+        conn.rollback()  # Reset failed transaction
+        # Log the error in error.txt
+        with open("error.txt", "a") as error_file:
+            error_file.write(f"Insertion failed for item {item_id}, category {kategorie_id}: {str(error)}\n")
+        print("Oh dang. Insertion @Item exception:", error)
+        print("Exception TYPE:", type(error))
+
+kategorien = "./Data/categories.xml"
 file_kat = open(kategorien, 'r', encoding="latin1")
 content_kat = file_kat.read()
 kategorien_soup = BeautifulSoup(content_kat, "xml")
