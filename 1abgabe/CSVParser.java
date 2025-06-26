@@ -34,7 +34,7 @@ public class CSVParser {
     private void loadProperties() {
         // Load Properties
         Properties props = new Properties();
-        String filepath = "1abgabe\\postgres.properties";
+        String filepath = "my.properties";
 
         try {
             FileInputStream fis = new FileInputStream(filepath);

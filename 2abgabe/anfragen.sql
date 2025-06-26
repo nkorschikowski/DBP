@@ -71,12 +71,30 @@
 -- -- WHERE person_id IN (SELECT person_id FROM kuenstler_cds) OR person_id IN (SELECT person_id FROM kuenstler_cds)
 
 -- 9. Wie hoch ist die durchschnittliche Anzahl von Liedern einer Musik-CD?
+-- -- -- TO TEST
+-- -- SELECT AVG(count)
+-- -- FROM (SELECT COUNT(titel_id) AS count FROM titel GROUP BY produkt_nr)
+
+-- -- -- TODO:
+-- -- -- 10. Für welche Produkte gibt es ähnliche Produkte in einer anderen Hauptkategorie?
+-- -- -- Hinweis: Eine Hauptkategorie ist eine Produktkategorie ohne Oberkategorie.
+-- -- -- Erstellen Sie eine rekursive Anfrage, die zu jedem Produkt dessen Hauptkategorie bestimmt.
+-- -- WITH RECURSIVE hauptkategorie
+-- -- AS (
+-- -- -- Base case
+-- -- SELECT -- kategorie des produkts
+-- -- UNION ALL
+-- -- -- Recursive case
+-- -- SELECT ...     -- alle überkatorien
+-- -- FROM cte_name ... )
+-- -- SELECT * FROM cte_name; -- die kategorie wo oberkategorie = null
 
 
--- 10. Für welche Produkte gibt es ähnliche Produkte in einer anderen Hauptkategorie? Hinweis: Eine Hauptkategorie ist eine Produktkategorie ohne Oberkategorie. Erstellen Sie eine rekursive Anfrage, die zu jedem Produkt dessen Hauptkategorie bestimmt.
+-- -- -- 11. Welche Produkte werden in allen Filialen angeboten?
+-- -- -- Hinweis: Ihre Query muss so formuliert werden, dass sie für eine beliebige Anzahl von Filialen funktioniert.
+-- -- -- Hinweis: Beachten Sie, dass ein Produkt mehrfach von einer Filiale angeboten werden kann (z.B. neu und gebraucht).
+-- -- SELECT produkt_nr
+-- -- FROM angebote
+-- -- GROUP BY
 
-
--- 11. Welche Produkte werden in allen Filialen angeboten? Hinweis: Ihre Query muss so formuliert werden, dass sie für eine beliebige Anzahl von Filialen funktioniert. Hinweis: Beachten Sie, dass ein Produkt mehrfach von einer Filiale angeboten werden kann (z.B. neu und gebraucht).
-
-
--- 12. In wieviel Prozent der Fälle der Frage 11 gibt es in Leipzig das preiswerteste Angebot?
+-- -- -- 12. In wieviel Prozent der Fälle der Frage 11 gibt es in Leipzig das preiswerteste Angebot?
