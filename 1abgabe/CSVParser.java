@@ -78,7 +78,7 @@ public class CSVParser {
         return result;
     }
 
-    private void parsePerson(int personid, String name) {
+    private void parsePerson(String name) {
         String insert_person = "INSERT INTO personen (name) VALUES (?)";
         try {
             PreparedStatement statement = con.prepareStatement(insert_person);
@@ -129,18 +129,8 @@ public class CSVParser {
 
                 int personid = checkForPerson(data[4]);
                 if (personid == 0) {
-                    parsePerson(personid, data[4]);
-                    // setzte personid auf die id der gerade geparsten Person
-                    String checkForPerson = "SELECT person_id FROM personen WHERE name = ?";
-                    try (PreparedStatement checkStmt = con.prepareStatement(checkForPerson)) {
-                        checkStmt.setString(1, name);
-                        ResultSet rs = checkStmt.executeQuery();
-                        if (rs.next()) {
-                            personid = rs.getInt("person_id");
-                        }
-                    } catch (SQLException sqle) {
-                        sqle.printStackTrace();
-                    }
+                    parsePerson(data[4]);
+                    personid = checkForPerson(data[4]);
                 }
 
                 parseReview(data, personid);
@@ -156,6 +146,7 @@ public class CSVParser {
         try (FileWriter log = new FileWriter("CSVabgelehnt.txt", true)) {
             log.write("Failed to Insert review of Produkt \"" + produkt_nr + "\"\n");
             log.write("SQL Error: " + e.getMessage() + "\n ------------ \n");
+            log.close();
         } catch (IOException ioe) {
             ioe.printStackTrace();
         }

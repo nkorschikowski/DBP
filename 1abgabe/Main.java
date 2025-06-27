@@ -16,7 +16,7 @@ public class Main {
 
         System.out.println("Start CSVParser");
         CSVParser csvParser = new CSVParser();
-        csvParser.parse("data\\shortreviews.csv");
+        csvParser.parse("data/reviews.csv");
         System.out.println("finished parsing CSV");
     }
 }
