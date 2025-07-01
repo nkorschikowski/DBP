@@ -66,7 +66,7 @@ CREATE TABLE musikcds (
 CREATE TABLE titel ( -- FEATURE: n:m tabelle machen (oder composite key?) für einfachere Abfrage "Auf welchen Alben finde ich das Lied Ocean von Peter" // kann ja auf mehreren sein ("Best of ...")
   titel_id serial PRIMARY KEY, -- weil Songs gleich heißen können
   name varchar(255),
-  produkt_nr varchar(255) UNIQUE NOT NULL,
+  produkt_nr varchar(255) NOT NULL,
   FOREIGN KEY (produkt_nr) REFERENCES musikcds (produkt_nr)
   ON DELETE CASCADE
   ON UPDATE CASCADE
