@@ -3,3 +3,4 @@ test
 *.properties
 errors.txt
 CSVabgelehnt.txt
+log.txt

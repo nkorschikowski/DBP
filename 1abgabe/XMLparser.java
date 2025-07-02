@@ -1,3 +1,4 @@
+
 // kommentiertes Java-Ladeprogramm bzw. SQL Statements zur XML-Transformation
 // soll automatisch inkonsistente Datensätze ablehnen und in "abgelehnt.txt"
 // schreiben
@@ -53,21 +54,18 @@ class XMLparser {
     }
 
     public static void insertData(
-        String url,
-        String name, 
-        String password, 
-        String path
-        )throws Exception 
-    {
+            String url,
+            String name,
+            String password,
+            String path) throws Exception {
         // Connect to the database
-        try (Connection conn = DriverManager.getConnection(url, name, password)) 
-        {
+        try (Connection conn = DriverManager.getConnection(url, name, password)) {
             XMLInputFactory factory = XMLInputFactory.newInstance();
             InputStream inputStream = new FileInputStream(path); // <-- Data input
             Reader xmlReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
             XMLEventReader reader = factory.createXMLEventReader(xmlReader);
 
-            //var for shop
+            // var for shop
             String shopName = null;
             String adresse = null;
             int filiale_id = 0;
@@ -78,9 +76,9 @@ class XMLparser {
             String hausnummer = "";
             String zusatz = "";
 
-            // var for table produkte 
-            String produkt_nr = null; 
-            String titel = null; 
+            // var for table produkte
+            String produkt_nr = null;
+            String titel = null;
             String bild = null;
             String produkttyp = null;
             Float rating = 0.0F;
@@ -97,7 +95,7 @@ class XMLparser {
             LocalDate erscheinungsdatum = null;
             String isbn = null;
             List<String> verlag = new ArrayList<>();
-            
+
             // var for dvds
             String format = null;
             LocalTime laufzeit = null;
@@ -107,27 +105,25 @@ class XMLparser {
             List<String> label = new ArrayList<>();
             String songTitle = null;
             List<String> song_list = new ArrayList<>();
-            
-            //var for personen
+
+            // var for personen
             List<String> personenName = new ArrayList<>();
             List<Integer> person_ids = new ArrayList<>();
-            int personen_key= -1;
-
+            int personen_key = -1;
 
             // var dvd_personen
             List<String> rolle = new ArrayList<>();
 
             // var similars
-            String produkt_nr1=null;
-            String produkt_nr2=null;
+            String produkt_nr1 = null;
+            String produkt_nr2 = null;
             List<String> sim_list = new ArrayList<>();
 
-
-            //SQL var
+            // SQL var
             String sql = null;
             PreparedStatement statement;
 
-            int itemcount=0;
+            int itemcount = 0;
             FileWriter writer = new FileWriter("log.txt", true);
 
             // Read XML file using StAX parser
@@ -136,14 +132,14 @@ class XMLparser {
                 i++;
                 XMLEvent event = reader.nextEvent();
                 XMLEvent nextEvent;
-                StringBuilder sb;
-                
+                StringBuilder sb = new StringBuilder();
+
                 if (event.isStartElement()) {
                     StartElement start = event.asStartElement();
                     String tag = start.getName().getLocalPart();
                     Attribute attr;
 
-                    switch(tag){
+                    switch (tag) {
                         case "shop":
                             attr = start.getAttributeByName(new QName("name"));
                             shopName = (attr != null) ? attr.getValue() : "";
@@ -156,15 +152,15 @@ class XMLparser {
 
                             adresse = str + ", " + zip;
 
-                            //insert sql befehle
-                            //save atomatically generated adressId while inserting
-                            //sql befehl insert into adressen straße, hausnummer, zusatz, plz, stadt
-                            //sql befehl insert into shop name, adresse
+                            // insert sql befehle
+                            // save atomatically generated adressId while inserting
+                            // sql befehl insert into adressen straße, hausnummer, zusatz, plz, stadt
+                            // sql befehl insert into shop name, adresse
                             adressId = insertAdress(conn, str, hausnummer, zusatz, zip, shopName);
                             filiale_id = insertShop(conn, shopName, adressId);
-                            writer.write("\n" +"Save var:" + shopName + ' ' + adresse);
-                            writer.write("\n" +"Save var:" + str + ' ' + hausnummer + ' ' + zip + ' ' + shopName); 
-                            
+                            writer.write("\n" + "Save var:" + shopName + ' ' + adresse);
+                            writer.write("\n" + "Save var:" + str + ' ' + hausnummer + ' ' + zip + ' ' + shopName);
+
                             break;
 
                         case "item":
@@ -176,21 +172,21 @@ class XMLparser {
 
                             attr = start.getAttributeByName(new QName("salesrank"));
                             verkaufsrang = -1;
-                            if (attr != null) {
+                            if (attr.getValue().toString() != "") {
                                 try {
                                     verkaufsrang = Integer.parseInt(attr.getValue());
                                 } catch (NumberFormatException e) {
-                                    System.err.println("Invalid salesrank: " + attr.getValue());
+                                    System.err.println("Invalid salesrank: " + attr.getValue() + " - " + produkt_nr);
                                 }
                             }
 
                             attr = start.getAttributeByName(new QName("picture"));
                             bild = (attr != null) ? attr.getValue() : "";
-                            titel = "";  
+                            titel = "";
                             break;
 
                         case "price":
-                            
+
                             attr = start.getAttributeByName(new QName("mult"));
                             mult = Float.parseFloat((attr != null) ? attr.getValue() : "");
 
@@ -198,7 +194,8 @@ class XMLparser {
                             nextEvent = reader.nextEvent();
                             if (nextEvent.isCharacters()) {
                                 sb.append(nextEvent.asCharacters().getData());
-                            } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
+                            } else if (nextEvent.isEndElement()
+                                    && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
                                 break;
                             }
 
@@ -210,7 +207,7 @@ class XMLparser {
                                 preis = Integer.parseInt(preisString);
                             } catch (NumberFormatException e) {
                                 try (FileWriter fw = new FileWriter("errors.txt", true);
-                                    PrintWriter pw = new PrintWriter(fw)) {
+                                        PrintWriter pw = new PrintWriter(fw)) {
                                     pw.println("Error parsing price:");
                                     pw.println("Input: '" + sb.toString().trim() + "'");
                                     pw.println("Error: " + e.getMessage());
@@ -223,7 +220,7 @@ class XMLparser {
                                 preis = 0; // or: skip inserting this item
                             }
                             mult *= preis;
-                            
+
                             attr = start.getAttributeByName(new QName("currency"));
                             currency = (attr != null) ? attr.getValue() : "";
 
@@ -241,7 +238,8 @@ class XMLparser {
                             nextEvent = reader.nextEvent();
                             if (nextEvent.isCharacters()) {
                                 sb.append(nextEvent.asCharacters().getData());
-                            } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
+                            } else if (nextEvent.isEndElement()
+                                    && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
                                 break;
                             }
                             titel = "";
@@ -252,7 +250,8 @@ class XMLparser {
                             while (reader.hasNext()) {
                                 event = reader.nextEvent();
                                 // If a <title> tag is found
-                                if (event.isStartElement() && event.asStartElement().getName().getLocalPart().equals("title")) {
+                                if (event.isStartElement()
+                                        && event.asStartElement().getName().getLocalPart().equals("title")) {
                                     event = reader.nextEvent(); // get the character data
                                     if (event.isCharacters()) {
                                         String title = event.asCharacters().getData().trim();
@@ -260,13 +259,13 @@ class XMLparser {
                                         song_list.add(songTitle);
                                     }
                                 }
-                                    // If we reach the end of </tracks>, we break the loop
-                                    if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("tracks")) {
-                                        break;
-                                    }
+                                // If we reach the end of </tracks>, we break the loop
+                                if (event.isEndElement()
+                                        && event.asEndElement().getName().getLocalPart().equals("tracks")) {
+                                    break;
                                 }
-                                break;
-
+                            }
+                            break;
 
                         case "isbn":
                             attr = start.getAttributeByName(new QName("val"));
@@ -289,30 +288,32 @@ class XMLparser {
                                 seitenzahl = 0; // empty element
                             }
                             break;
-                            
+
                         case "publication":
                             attr = start.getAttributeByName(new QName("date"));
                             try {
-                                erscheinungsdatum = (attr != null && attr.getValue() != null && !attr.getValue().isEmpty())
-                                    ? LocalDate.parse(attr.getValue())
-                                    : null;
+                                erscheinungsdatum = (attr != null && attr.getValue() != null
+                                        && !attr.getValue().isEmpty())
+                                                ? LocalDate.parse(attr.getValue())
+                                                : null;
                             } catch (DateTimeParseException e) {
                                 erscheinungsdatum = null;
                                 System.err.println("Invalid date: " + attr.getValue());
                             }
                             break;
 
-                        case "releasedate": 
-                             try {
+                        case "releasedate":
+                            try {
                                 StringBuilder dateBuilder = new StringBuilder();
-                                    nextEvent = reader.nextEvent();
-                                    if (nextEvent.isCharacters()) {
-                                        dateBuilder.append(nextEvent.asCharacters().getData());
-                                    } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/releasedate")) {
-                                        break;
-                                    }
-                                if(!dateBuilder.isEmpty()){
-                                erscheinungsdatum = LocalDate.parse(dateBuilder.toString().trim()); 
+                                nextEvent = reader.nextEvent();
+                                if (nextEvent.isCharacters()) {
+                                    dateBuilder.append(nextEvent.asCharacters().getData());
+                                } else if (nextEvent.isEndElement()
+                                        && nextEvent.asEndElement().getName().getLocalPart().equals("/releasedate")) {
+                                    break;
+                                }
+                                if (!dateBuilder.isEmpty()) {
+                                    erscheinungsdatum = LocalDate.parse(dateBuilder.toString().trim());
                                 }
                             } catch (Exception e) {
                                 System.err.println("Invalid releasedate format.");
@@ -324,7 +325,8 @@ class XMLparser {
                             nextEvent = reader.nextEvent();
                             if (nextEvent.isCharacters()) {
                                 sb.append(nextEvent.asCharacters().getData());
-                            } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
+                            } else if (nextEvent.isEndElement()
+                                    && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
                                 break;
                             }
                             format = sb.toString().trim();
@@ -335,10 +337,11 @@ class XMLparser {
                             nextEvent = reader.nextEvent();
                             if (nextEvent.isCharacters()) {
                                 sb.append(nextEvent.asCharacters().getData());
-                            } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
+                            } else if (nextEvent.isEndElement()
+                                    && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
                                 break;
                             }
-                            if(!sb.isEmpty()){
+                            if (!sb.isEmpty()) {
                                 region_code = Integer.parseInt(sb.toString().trim());
                             }
                             break;
@@ -348,46 +351,51 @@ class XMLparser {
                             nextEvent = reader.nextEvent();
                             if (nextEvent.isCharacters()) {
                                 sb.append(nextEvent.asCharacters().getData());
-                            } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
+                            } else if (nextEvent.isEndElement()
+                                    && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
                                 break;
                             }
-                            if (sb != null) {
+                            if (!sb.toString().isEmpty()) {
                                 try {
                                     int minutes = Integer.parseInt(sb.toString().trim());
                                     laufzeit = LocalTime.of(minutes / 60, minutes % 60);
                                 } catch (Exception e) {
-                                    System.err.println("Invalid time: " + sb.toString().trim());
+                                    System.err.println("Invalid time: " + sb.toString().trim() + produkt_nr);
                                 }
+                            } else {
+                                laufzeit = null;
                             }
                             break;
 
                         case "publisher":
-                            if(shopName.equals("Leipzig")){
+                            if (shopName.equals("Leipzig")) {
                                 attr = start.getAttributeByName(new QName("name"));
                                 verlag.add((attr != null) ? attr.getValue() : "");
-                            } else if (shopName.equals("Dresden")){
+                            } else if (shopName.equals("Dresden")) {
                                 sb = new StringBuilder();
                                 nextEvent = reader.nextEvent();
                                 if (nextEvent.isCharacters()) {
                                     sb.append(nextEvent.asCharacters().getData());
-                                } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
-                                 break;
+                                } else if (nextEvent.isEndElement()
+                                        && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
+                                    break;
                                 }
                                 verlag.add(sb.toString().trim());
                             }
                             break;
 
                         case "label":
-                            if(shopName.equals("Leipzig")){
+                            if (shopName.equals("Leipzig")) {
                                 attr = start.getAttributeByName(new QName("name"));
                                 label.add((attr != null) ? attr.getValue() : "");
-                                
-                            } else if(shopName.equals( "Dresden")){ 
+
+                            } else if (shopName.equals("Dresden")) {
                                 sb = new StringBuilder();
                                 nextEvent = reader.nextEvent();
                                 if (nextEvent.isCharacters()) {
                                     sb.append(nextEvent.asCharacters().getData());
-                                } else if (nextEvent.isEndElement() && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
+                                } else if (nextEvent.isEndElement()
+                                        && nextEvent.asEndElement().getName().getLocalPart().equals("/titel")) {
                                     break;
                                 }
                                 label.add(sb.toString().trim());
@@ -395,17 +403,19 @@ class XMLparser {
                             break;
 
                         case "similars":
-                        produkt_nr1 = produkt_nr;
+                            produkt_nr1 = produkt_nr;
                             if (shopName.equals("Leipzig")) {
                                 while (reader.hasNext()) {
                                     event = reader.nextEvent();
                                     // Start of <sim_product>
-                                    if (event.isStartElement() && event.asStartElement().getName().getLocalPart().equals("sim_product")) {
+                                    if (event.isStartElement()
+                                            && event.asStartElement().getName().getLocalPart().equals("sim_product")) {
                                         produkt_nr2 = null;
                                         while (reader.hasNext()) {
                                             event = reader.nextEvent();
                                             // Detect <asin> start
-                                            if (event.isStartElement() && event.asStartElement().getName().getLocalPart().equals("asin")) {
+                                            if (event.isStartElement()
+                                                    && event.asStartElement().getName().getLocalPart().equals("asin")) {
                                                 event = reader.nextEvent();
                                                 if (event.isCharacters()) {
                                                     produkt_nr2 = event.asCharacters().getData().trim();
@@ -413,76 +423,82 @@ class XMLparser {
                                                 }
                                             }
                                             // Break out when we reach </sim_product>
-                                            if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("sim_product")) {
+                                            if (event.isEndElement() && event.asEndElement().getName().getLocalPart()
+                                                    .equals("sim_product")) {
                                                 break;
                                             }
                                         }
                                     }
 
                                     // Stop when </similars> is reached
-                                    if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("similars")) {
+                                    if (event.isEndElement()
+                                            && event.asEndElement().getName().getLocalPart().equals("similars")) {
                                         break;
                                     }
                                 }
-                            }else if(shopName.equals("Dresden")){
-                            while (reader.hasNext()) {
-                                event = reader.nextEvent();
-                                // Exit if we reach the end of <similars>
-                                if (event.isEndElement() && event.asEndElement().getName().getLocalPart().equals("similars")) {
-                                    break;
-                                }
-                                // Only process start elements
-                                if (event.isStartElement()) {
-                                    start = event.asStartElement();
-                                    tag = start.getName().getLocalPart();
-                                    if ("item".equals(tag)) {
-                                        attr = start.getAttributeByName(new QName("asin"));
-                                        produkt_nr2 = (attr != null) ? attr.getValue() : "";
-                                        sim_list.add(produkt_nr2);
+                            } else if (shopName.equals("Dresden")) {
+                                while (reader.hasNext()) {
+                                    event = reader.nextEvent();
+                                    // Exit if we reach the end of <similars>
+                                    if (event.isEndElement()
+                                            && event.asEndElement().getName().getLocalPart().equals("similars")) {
+                                        break;
+                                    }
+                                    // Only process start elements
+                                    if (event.isStartElement()) {
+                                        start = event.asStartElement();
+                                        tag = start.getName().getLocalPart();
+                                        if ("item".equals(tag)) {
+                                            attr = start.getAttributeByName(new QName("asin"));
+                                            produkt_nr2 = (attr != null) ? attr.getValue() : "";
+                                            sim_list.add(produkt_nr2);
+                                        }
                                     }
                                 }
-                            }
-                            break;
+                                break;
                             }
                             break;
 
                         case "author":
                         case "artist":
                         case "actor":
-                        case "creator": 
+                        case "creator":
                         case "director":
-                            if(shopName.equals("Leipzig")){
+                            if (shopName.equals("Leipzig")) {
                                 attr = start.getAttributeByName(new QName("name"));
                                 personenName.add((attr != null) ? attr.getValue() : "");
-                                
-                            } else if(shopName.equals("Dresden")){
+
+                            } else if (shopName.equals("Dresden")) {
                                 sb = new StringBuilder();
                                 nextEvent = reader.nextEvent();
                                 if (nextEvent.isCharacters()) {
                                     sb.append(nextEvent.asCharacters().getData());
                                     personenName.add(sb.toString().trim());
-                                } else if (nextEvent.isEndElement() && 
-                                nextEvent.asEndElement().getName().getLocalPart().equals("/author") || 
-                                nextEvent.asEndElement().getName().getLocalPart().equals("/artist") ||
-                                nextEvent.asEndElement().getName().getLocalPart().equals("/actor")  ||
-                                nextEvent.asEndElement().getName().getLocalPart().equals("/creator")||
-                                nextEvent.asEndElement().getName().getLocalPart().equals("/director") ) {
+                                } else if (nextEvent.isEndElement() &&
+                                        nextEvent.asEndElement().getName().getLocalPart().equals("/author") ||
+                                        nextEvent.asEndElement().getName().getLocalPart().equals("/artist") ||
+                                        nextEvent.asEndElement().getName().getLocalPart().equals("/actor") ||
+                                        nextEvent.asEndElement().getName().getLocalPart().equals("/creator") ||
+                                        nextEvent.asEndElement().getName().getLocalPart().equals("/director")) {
                                     break;
                                 }
                             }
 
-                            switch(tag) {
-                                case "actor": rolle.add("Actor");
+                            switch (tag) {
+                                case "actor":
+                                    rolle.add("Actor");
                                     break;
-                                case "creator": rolle.add("Producer");
+                                case "creator":
+                                    rolle.add("Producer");
                                     break;
-                                case "director": rolle.add("Director");
+                                case "director":
+                                    rolle.add("Director");
                                     break;
-                                case "artist": 
-                                        break;
-                                case "author": 
+                                case "artist":
                                     break;
-                                default:  
+                                case "author":
+                                    break;
+                                default:
                                     break;
                             }
                             break;
@@ -492,102 +508,100 @@ class XMLparser {
                     String tag = end.getName().getLocalPart();
                     if (tag.equals("item")) {
                         // insert items
-                        //sqlbefehl insert into produkte titel, rating, verkaufsrang, bild, produkttyp dresden
+                        // sqlbefehl insert into produkte titel, rating, verkaufsrang, bild, produkttyp
+                        // dresden
                         insertItem(conn, produkt_nr, titel, rating, verkaufsrang, bild, produkttyp);
-                        writer.write("\n" +"Save var: " + produkt_nr);
-                        writer.write("\n" +"Save var: " + titel);
-                        writer.write("\n" +"Save var: " + verkaufsrang);
-                        writer.write("\n" +"Save var: " + bild);
-                        writer.write("\n" +"Save var: " + produkttyp);
-                        if(mult > 0){
-                            insertAngebot(conn, produkt_nr, filiale_id , mult, zustand);
-                            writer.write("\n" +"Save var: " + titel);
-                            writer.write("\n" +"Save var: " + verkaufsrang);
-                            writer.write("\n" +"Save var: " + bild);
-                            writer.write("\n" +"Save var: " + produkttyp);
-                             
-                           
+                        writer.write("\n" + "Save var: " + produkt_nr);
+                        writer.write("\n" + "Save var: " + titel);
+                        writer.write("\n" + "Save var: " + verkaufsrang);
+                        writer.write("\n" + "Save var: " + bild);
+                        writer.write("\n" + "Save var: " + produkttyp);
+                        if (mult > 0) {
+                            insertAngebot(conn, produkt_nr, filiale_id, mult, zustand);
+                            writer.write("\n" + "Save var: " + titel);
+                            writer.write("\n" + "Save var: " + verkaufsrang);
+                            writer.write("\n" + "Save var: " + bild);
+                            writer.write("\n" + "Save var: " + produkttyp);
+
                         }
                         // insert person
-                        for(String x : personenName){
-                            //insert into Personen conn, name
+                        for (String x : personenName) {
+                            // insert into Personen conn, name
                             person_ids.add(insertPerson(conn, x));
-                            writer.write("\n" +"Save insertPerson:" + x);
-                            
-                            
+                            writer.write("\n" + "Save insertPerson:" + x);
+
                         }
                         // insert type dependent items
-                        switch(produkttyp){
+                        switch (produkttyp) {
                             case "DVD":
-                                //insert into dvds format, laufzeit, regioncode
+                                // insert into dvds format, laufzeit, regioncode
                                 insertFilmDvd(conn, produkt_nr, format, laufzeit, region_code);
-                                writer.write("\n" +"Save insertFilmDvd: " + produkt_nr);
-                                writer.write("\n" +"Save insertFilmDvd: " + format);
-                                writer.write("\n" +"Save insertFilmDvd: " + laufzeit);
-                                writer.write("\n" +"Save insertFilmDvd: " + region_code);
-                                 
-                                for(int k = 0; k<person_ids.size(); k++){
-                                    //sqlbefehl insert into kuenstler_cds produkt_nr, person_id
+                                writer.write("\n" + "Save insertFilmDvd: " + produkt_nr);
+                                writer.write("\n" + "Save insertFilmDvd: " + format);
+                                writer.write("\n" + "Save insertFilmDvd: " + laufzeit);
+                                writer.write("\n" + "Save insertFilmDvd: " + region_code);
+
+                                for (int k = 0; k < person_ids.size(); k++) {
+                                    // sqlbefehl insert into kuenstler_cds produkt_nr, person_id
                                     insertDvdPerson(conn, produkt_nr, person_ids.get(k), rolle.get(k));
-                                    writer.write("\n" +"Save insertDvdPerson: " + produkt_nr);
-                                    writer.write("\n" +"Save insertDvdPerson: " + person_ids.get(k));
-                                    writer.write("\n" +"Save insertDvdPerson: " + rolle.get(k));
-                                    
-                                    
+                                    writer.write("\n" + "Save insertDvdPerson: " + produkt_nr);
+                                    writer.write("\n" + "Save insertDvdPerson: " + person_ids.get(k));
+                                    writer.write("\n" + "Save insertDvdPerson: " + rolle.get(k));
+
                                 }
                                 break;
                             case "Book":
-                                for(String x : verlag){
-                                    //sql befehl insert into buecher seitenzahl, erscheinungsdatum, isbn, verlag
+                                for (String x : verlag) {
+                                    // sql befehl insert into buecher seitenzahl, erscheinungsdatum, isbn, verlag
                                     insertLiteraturBuch(conn, produkt_nr, seitenzahl, erscheinungsdatum, isbn, x);
-                                    writer.write("\n" +"Save insertLiteraturBuch: " + produkt_nr);
-                                    writer.write("\n" +"Save insertLiteraturBuch: " + seitenzahl);
-                                    writer.write("\n" +"Save insertLiteraturBuch: " + erscheinungsdatum);
-                                    writer.write("\n" +"Save insertLiteraturBuch: " + isbn);
-                                    writer.write("\n" +"Save insertLiteraturBuch: " + x);
-                                    
+                                    writer.write("\n" + "Save insertLiteraturBuch: " + produkt_nr);
+                                    writer.write("\n" + "Save insertLiteraturBuch: " + seitenzahl);
+                                    writer.write("\n" + "Save insertLiteraturBuch: " + erscheinungsdatum);
+                                    writer.write("\n" + "Save insertLiteraturBuch: " + isbn);
+                                    writer.write("\n" + "Save insertLiteraturBuch: " + x);
+
                                 }
-                                for(int k = 0; k<person_ids.size(); k++){
-                                    //sqlbefhel insert into autoren_buecher produkt_nr, person_id
+                                for (int k = 0; k < person_ids.size(); k++) {
+                                    // sqlbefhel insert into autoren_buecher produkt_nr, person_id
                                     insertBuchPerson(conn, produkt_nr, person_ids.get(k));
-                                    writer.write("\n" +"Save insertBuchPerson:" + produkt_nr);
-                                    writer.write("\n" +"Save insertBuchPerson:" + person_ids.get(k));
-                                                                    }
-                                break;
-                            case "Music":   
-                                for(String x : label){
-                                    //sqlbefehl for insert into musikcd
-                                    insertMusikCd(conn, produkt_nr, x, erscheinungsdatum);
-                                    writer.write("\n" +"Save insertMusikCd: " + produkt_nr);
-                                    writer.write("\n" +"Save insertMusikCd: " + x);
-                                   writer.write("\n" +"Save insertMusikCd: " + erscheinungsdatum);
-                                    
+                                    writer.write("\n" + "Save insertBuchPerson:" + produkt_nr);
+                                    writer.write("\n" + "Save insertBuchPerson:" + person_ids.get(k));
                                 }
-                                for(int k = 0; k<person_ids.size(); k++){
-                                    //sqlbefehl insert into kuenstler_cds produkt_nr, person_id
+                                break;
+                            case "Music":
+                                for (String x : label) {
+                                    // sqlbefehl for insert into musikcd
+                                    insertMusikCd(conn, produkt_nr, x, erscheinungsdatum);
+                                    writer.write("\n" + "Save insertMusikCd: " + produkt_nr);
+                                    writer.write("\n" + "Save insertMusikCd: " + x);
+                                    writer.write("\n" + "Save insertMusikCd: " + erscheinungsdatum);
+
+                                }
+                                for (int k = 0; k < person_ids.size(); k++) {
+                                    // sqlbefehl insert into kuenstler_cds produkt_nr, person_id
                                     insertMusikPerson(conn, produkt_nr, person_ids.get(k));
-                                    writer.write("\n" +"Save musikPerson:" + produkt_nr);
-                                    writer.write("\n" +"Save musikPerson:" + person_ids.get(k));
-                                    
+                                    writer.write("\n" + "Save musikPerson:" + produkt_nr);
+                                    writer.write("\n" + "Save musikPerson:" + person_ids.get(k));
+
                                 }
                                 break;
                         }
-                        //insertloop songs
-                        for (String one_song : song_list){
-                            //sqlbefehl insert songtitles
-                            //insertSongTitle(conn, songTitle, produkt_nr2);
+                        // insertloop songs
+                        for (String one_song : song_list) {
+                            // sqlbefehl insert songtitles
+                            // insertSongTitle(conn, songTitle, produkt_nr2);
                             insertSongTitle(conn, one_song, produkt_nr);
-                            writer.write("\n" +"Save insertSongTitle: " + one_song);
-                            writer.write("\n" +"Save insertSongTitle: " + produkt_nr);
-                            
+                            writer.write("\n" + "Save insertSongTitle: " + one_song);
+                            writer.write("\n" + "Save insertSongTitle: " + produkt_nr);
+
                         }
                         // insertloop similars
-                        for(String sim : sim_list){
-                            //sql befehl insert into aehnliche_produkte produkt_nr1, produkt_nr2
+                        for (String sim : sim_list) {
+                            // sql befehl insert into aehnliche_produkte produkt_nr1, produkt_nr2
                             insertSimilar(conn, produkt_nr1, sim);
-                            writer.write("\n" +"Save similars: " + produkt_nr1);
-                            writer.write("\n" +"Save similars: " + sim);
-                            
+                            writer.write("\n" + "Save similars: " + produkt_nr1);
+                            writer.write("\n" + "Save similars: " + sim);
+
                         }
                         personenName = new ArrayList<>();
                         person_ids = new ArrayList<>();
@@ -596,63 +610,61 @@ class XMLparser {
                         rolle = new ArrayList<>();
                         label = new ArrayList<>();
                         verlag = new ArrayList<>();
-                        
+
                     }
-                
+
                 }
             }
         }
     }
 
     public static int insertPerson(
-        Connection conn, 
-        String name
-        )throws SQLException {
-    //sql befehl insert into personen person_id, name
+            Connection conn,
+            String name) throws SQLException {
+        // sql befehl insert into personen person_id, name
         PreparedStatement statement;
         String sql = "INSERT INTO personen (name) VALUES (?)";
-        try{
+        try {
             statement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             statement.setString(1, name);
             statement.executeUpdate();
             ResultSet personSet = statement.getGeneratedKeys();
-                
+
             if (personSet.next()) {
                 int personen_key = personSet.getInt(1);
                 return personen_key;
             } else {
                 throw new SQLException("No address ID generated!");
-            } 
-        } catch(SQLException e){
-            if (e.getSQLState().equals("23505")) {  // PostgreSQL unique_violation SQL state
-            // Now query the existing person ID
-            sql = "SELECT person_id FROM personen WHERE name = ?";
-            statement = conn.prepareStatement(sql);
-            statement.setString(1, name);
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next()) {
-                int existingPersonId = resultSet.getInt("person_id");
-                return existingPersonId;
-            } else {
-                throw new SQLException("Person exists but ID not found.");
             }
-        } else {
-            // Re-throw other SQL exceptions
-            throw e;
+        } catch (SQLException e) {
+            if (e.getSQLState().equals("23505")) { // PostgreSQL unique_violation SQL state
+                // Now query the existing person ID
+                sql = "SELECT person_id FROM personen WHERE name = ?";
+                statement = conn.prepareStatement(sql);
+                statement.setString(1, name);
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next()) {
+                    int existingPersonId = resultSet.getInt("person_id");
+                    return existingPersonId;
+                } else {
+                    throw new SQLException("Person exists but ID not found.");
+                }
+            } else {
+                // Re-throw other SQL exceptions
+                throw e;
+            }
         }
-        }    
     }
 
     public static void insertDvdPerson(Connection conn,
-                                        String produkt_nr, 
-                                        int person_key, String rolle) 
-                                        throws SQLException, 
-                                        IOException
-    {
+            String produkt_nr,
+            int person_key, String rolle)
+            throws SQLException,
+            IOException {
 
-        //sql befehl insert into dvd_personen produkt_nr, person_id, rolle
-        try{
+        // sql befehl insert into dvd_personen produkt_nr, person_id, rolle
+        try {
             PreparedStatement statement;
             String sql = "INSERT INTO dvd_personen (produkt_nr, person_id, rolle) VALUES (?, ?, ?)";
             statement = conn.prepareStatement(sql);
@@ -660,18 +672,18 @@ class XMLparser {
             statement.setInt(2, person_key);
             statement.setString(3, rolle);
             statement.executeUpdate();
-            } catch (SQLException e) {
+        } catch (SQLException e) {
             String sqlState = e.getSQLState();
             try (FileWriter fw = new FileWriter("errors.txt", true);
                     PrintWriter pw = new PrintWriter(fw)) {
-                    pw.println("Foreign key constraint failed for produkt_nr: " + produkt_nr);
-                    pw.println("Error: " + e.getMessage());
-                    pw.println("---");
-                
+                pw.println("Foreign key constraint failed for produkt_nr: " + produkt_nr);
+                pw.println("Error: " + e.getMessage());
+                pw.println("---");
+
                 if (e.getSQLState().equals("23503")) { // Foreign key violation
-                
-                }else if ("23505".equals(sqlState)) { // Duplicate key
-                        pw.println("Duplicate key error when inserting into musikcds:");
+
+                } else if ("23505".equals(sqlState)) { // Duplicate key
+                    pw.println("Duplicate key error when inserting into musikcds:");
                 } else {
                     throw e; // re-throw other unexpected SQL errors
                 }
@@ -679,84 +691,80 @@ class XMLparser {
         }
     }
 
-    public static void insertMusikPerson(Connection conn, 
-                                        String produkt_nr, 
-                                        int personen_key) 
-                                        throws SQLException, 
-                                        IOException
-    {
-        //sqlbefehl insert into kuenstler_cds produkt_nr, person_id
-        try{
-        PreparedStatement statement;
-        String sql = "INSERT INTO kuenstler_cds (produkt_nr, person_id) VALUES (?,?)";
-        statement = conn.prepareStatement(sql);
-        statement.setString(1, produkt_nr);
-        statement.setInt(2, personen_key);
-        statement.executeUpdate(); 
+    public static void insertMusikPerson(Connection conn,
+            String produkt_nr,
+            int personen_key)
+            throws SQLException,
+            IOException {
+        // sqlbefehl insert into kuenstler_cds produkt_nr, person_id
+        try {
+            PreparedStatement statement;
+            String sql = "INSERT INTO kuenstler_cds (produkt_nr, person_id) VALUES (?,?)";
+            statement = conn.prepareStatement(sql);
+            statement.setString(1, produkt_nr);
+            statement.setInt(2, personen_key);
+            statement.executeUpdate();
         } catch (SQLException e) {
             String sqlState = e.getSQLState();
             try (FileWriter fw = new FileWriter("errors.txt", true);
                     PrintWriter pw = new PrintWriter(fw)) {
-                    pw.println("Foreign key constraint failed for produkt_nr: " + produkt_nr);
-                    pw.println("Error: " + e.getMessage());
-                    pw.println("---");
-                
+                pw.println("Foreign key constraint failed for produkt_nr: " + produkt_nr);
+                pw.println("Error: " + e.getMessage());
+                pw.println("---");
+
                 if (e.getSQLState().equals("23503")) { // Foreign key violation
-                
-                }else if ("23505".equals(sqlState)) { // Duplicate key
-                        pw.println("Duplicate key error when inserting into musikcds:");
+
+                } else if ("23505".equals(sqlState)) { // Duplicate key
+                    pw.println("Duplicate key error when inserting into musikcds:");
                 } else {
                     throw e; // re-throw other unexpected SQL errors
                 }
             }
-        }  
+        }
     }
 
     public static void insertBuchPerson(
-        Connection conn, 
-        String produkt_nr,
-        int personen_key
-        ) 
-        throws SQLException,
-        IOException
-    {
-        //sqlbefhel insert into autoren_buecher produkt_nr, person_id
-        try{
-        PreparedStatement statement;
-        String sql = "INSERT INTO autoren_buecher (produkt_nr, person_id) VALUES (?,?)";
-        statement = conn.prepareStatement(sql);
-        statement.setString(1, produkt_nr);
-        statement.setInt(2, personen_key);
-        statement.executeUpdate(); 
+            Connection conn,
+            String produkt_nr,
+            int personen_key)
+            throws SQLException,
+            IOException {
+        // sqlbefhel insert into autoren_buecher produkt_nr, person_id
+        try {
+            PreparedStatement statement;
+            String sql = "INSERT INTO autoren_buecher (produkt_nr, person_id) VALUES (?,?)";
+            statement = conn.prepareStatement(sql);
+            statement.setString(1, produkt_nr);
+            statement.setInt(2, personen_key);
+            statement.executeUpdate();
         } catch (SQLException e) {
             String sqlState = e.getSQLState();
             try (FileWriter fw = new FileWriter("errors.txt", true);
                     PrintWriter pw = new PrintWriter(fw)) {
-                    pw.println("Foreign key constraint failed for produkt_nr: " + produkt_nr);
-                    pw.println("Error: " + e.getMessage());
-                    pw.println("---");
-                
+                pw.println("Foreign key constraint failed for produkt_nr: " + produkt_nr);
+                pw.println("Error: " + e.getMessage());
+                pw.println("---");
+
                 if (e.getSQLState().equals("23503")) { // Foreign key violation
-                
-                }else if ("23505".equals(sqlState)) { // Duplicate key
-                        pw.println("Duplicate key error when inserting into musikcds:");
+
+                } else if ("23505".equals(sqlState)) { // Duplicate key
+                    pw.println("Duplicate key error when inserting into musikcds:");
                 } else {
                     throw e; // re-throw other unexpected SQL errors
                 }
             }
-        }   
+        }
     }
 
     public static void insertMusikCd(
-        Connection conn, 
-        String produkt_nr, 
-        String label,
-        LocalDate erscheinungsdatum) 
-        throws SQLException, 
-        IOException
-    {
+            Connection conn,
+            String produkt_nr,
+            String label,
+            LocalDate erscheinungsdatum)
+            throws SQLException,
+            IOException {
         try {
-            //sqlbefhel insert into musikcds produkt_nr, label, erscheinungsdatum
+            // sqlbefhel insert into musikcds produkt_nr, label, erscheinungsdatum
             PreparedStatement statement;
             String sql = "INSERT INTO musikcds (produkt_nr, label, erscheinungsdatum) VALUES (?, ?, ?)";
             statement = conn.prepareStatement(sql);
@@ -772,10 +780,10 @@ class XMLparser {
 
         } catch (SQLException e) {
             String sqlState = e.getSQLState();
-            
+
             try (FileWriter fw = new FileWriter("errors.txt", true);
-                PrintWriter pw = new PrintWriter(fw)) {
-                
+                    PrintWriter pw = new PrintWriter(fw)) {
+
                 if ("23505".equals(sqlState)) { // Duplicate key
                     pw.println("Duplicate key error when inserting into musikcds:");
                 } else if ("23503".equals(sqlState)) { // Foreign key violation
@@ -795,14 +803,12 @@ class XMLparser {
     }
 
     public static void insertFilmDvd(
-        Connection conn,
-        String produkt_nr,
-        String format,
-        LocalTime laufzeit,
-        int region_code
-    )throws SQLException, IOException
-    {
-        //insert into dvds format, laufzeit, regioncode
+            Connection conn,
+            String produkt_nr,
+            String format,
+            LocalTime laufzeit,
+            int region_code) throws SQLException, IOException {
+        // insert into dvds format, laufzeit, regioncode
         try {
             PreparedStatement statement;
             String sql = "INSERT INTO dvds (produkt_nr, format, laufzeit, region_code) VALUES (?, ?, ?, ?)";
@@ -814,10 +820,10 @@ class XMLparser {
             statement.executeUpdate();
         } catch (SQLException e) {
             String sqlState = e.getSQLState();
-            
+
             try (FileWriter fw = new FileWriter("errors.txt", true);
-                PrintWriter pw = new PrintWriter(fw)) {
-                
+                    PrintWriter pw = new PrintWriter(fw)) {
+
                 if ("23505".equals(sqlState)) { // Duplicate key
                     pw.println("Duplicate key error when inserting into musikcds:");
                 } else if ("23503".equals(sqlState)) { // Foreign key violation
@@ -834,17 +840,16 @@ class XMLparser {
                 System.err.println("Could not write to errors.txt: " + ioEx.getMessage());
             }
         }
-    } 
+    }
 
     public static void insertLiteraturBuch(
-        Connection conn,
-        String produkt_nr,
-        int seitenzahl,
-        LocalDate erscheinungsdatum,
-        String isbn,
-        String verlag
-    ) throws SQLException, IOException{
-        //sql befehl insert into buecher seitenzahl, erscheinungsdatum, isbn, verlag
+            Connection conn,
+            String produkt_nr,
+            int seitenzahl,
+            LocalDate erscheinungsdatum,
+            String isbn,
+            String verlag) throws SQLException, IOException {
+        // sql befehl insert into buecher seitenzahl, erscheinungsdatum, isbn, verlag
         try {
             PreparedStatement statement;
             String sql = "INSERT INTO buecher (produkt_nr, seitenzahl, erscheinungsdatum, isbn, verlag) VALUES (?, ?, ?, ?, ?)";
@@ -864,7 +869,7 @@ class XMLparser {
 
         } catch (SQLException e) {
             try (FileWriter fw = new FileWriter("errors.txt", true);
-                PrintWriter pw = new PrintWriter(fw)) {
+                    PrintWriter pw = new PrintWriter(fw)) {
 
                 if ("23505".equals(e.getSQLState())) { // Duplicate key
                     pw.println("Duplicate key for buch_id: " + produkt_nr);
@@ -885,12 +890,11 @@ class XMLparser {
     }
 
     public static void insertSimilar(
-                                        Connection conn,
-                                        String produkt_nr1,
-                                        String produkt_nr2
-    )throws SQLException{
+            Connection conn,
+            String produkt_nr1,
+            String produkt_nr2) throws SQLException {
         try {
-            //sqlbefhel insert into aehnliche_produkte produkt_nr1, produkt_nr2
+            // sqlbefhel insert into aehnliche_produkte produkt_nr1, produkt_nr2
             PreparedStatement statement;
             String sql = "INSERT INTO aehnliche_produkte (produkt_nr1, produkt_nr2) VALUES (?, ?)";
             statement = conn.prepareStatement(sql);
@@ -901,7 +905,7 @@ class XMLparser {
             String sqlState = e.getSQLState();
 
             try (FileWriter fw = new FileWriter("errors.txt", true);
-                PrintWriter pw = new PrintWriter(fw)) {
+                    PrintWriter pw = new PrintWriter(fw)) {
 
                 if ("23503".equals(sqlState)) { // Foreign key violation
                     pw.println("Foreign Key Violation:");
@@ -910,7 +914,7 @@ class XMLparser {
                     pw.println("Duplicate Key Violation:");
                     pw.println("produkt_nr1: " + produkt_nr1 + ", produkt_nr2: " + produkt_nr2);
                 } else if ("23514".equals(sqlState)) { // Check constraint violation
-                     pw.println("Check Constraint Violation:");
+                    pw.println("Check Constraint Violation:");
                 } else {
                     // Unknown SQL error, rethrow
                     throw e;
@@ -918,7 +922,7 @@ class XMLparser {
 
                 pw.println("produkt_nr1: " + produkt_nr1 + ", produkt_nr2: " + produkt_nr2);
                 pw.println("Error Message: " + e.getMessage());
-                pw.println("---");  
+                pw.println("---");
             } catch (IOException ioEx) {
                 System.err.println("Could not write to errors.txt: " + ioEx.getMessage());
             }
@@ -926,11 +930,9 @@ class XMLparser {
     }
 
     public static void insertSongTitle(
-        Connection conn,
-        String songTitle,
-        String produkt_nr
-    )throws SQLException
-    {
+            Connection conn,
+            String songTitle,
+            String produkt_nr) throws SQLException {
         try {
             // SQL insert for title
             PreparedStatement statement;
@@ -943,7 +945,7 @@ class XMLparser {
         } catch (SQLException e) {
             // Log duplicate key or other errors to a file
             try (FileWriter fw = new FileWriter("errors.txt", true);
-                PrintWriter pw = new PrintWriter(fw)) {
+                    PrintWriter pw = new PrintWriter(fw)) {
                 pw.println("Failed to insert track: \"" + songTitle + "\" for product " + produkt_nr);
                 pw.println("Error: " + e.getMessage());
                 pw.println("---");
@@ -952,56 +954,52 @@ class XMLparser {
             }
         }
     }
-    
+
     public static void insertItem(
-        Connection conn, 
-        String produkt_nr,
-        String titel,
-        Float rating,
-        int verkaufsrang,
-        String bild,
-        String produkttyp
-        ) throws SQLException, IOException
-        {
+            Connection conn,
+            String produkt_nr,
+            String titel,
+            Float rating,
+            int verkaufsrang,
+            String bild,
+            String produkttyp) throws SQLException, IOException {
         try {
-                PreparedStatement statement;
-                String sql = "INSERT INTO produkte (produkt_nr, titel, rating, verkaufsrang, bild, produkttyp) VALUES (?, ?, ?, ?, ?, ?)";
-                statement = conn.prepareStatement(sql);
-                statement.setString(1, produkt_nr);
-                statement.setString(2, titel);
-                statement.setFloat(3, rating);
-                statement.setInt(4, verkaufsrang);
-                statement.setString(5, bild);
-                statement.setString(6, produkttyp);
-                statement.executeUpdate(); 
-                } catch (SQLException e) {
-                    try (FileWriter fw = new FileWriter("errors.txt", true);
-                        PrintWriter pw = new PrintWriter(fw)) {
-                        
-                        pw.println("SQL error when inserting into produkte:");
-                        pw.println("produkt_nr: " + produkt_nr);
-                        pw.println("titel: " + titel);
-                        pw.println("produkttyp: " + produkttyp);
-                        pw.println("SQLState: " + e.getSQLState());
-                        pw.println("Error Code: " + e.getErrorCode());
-                        pw.println("Message: " + e.getMessage());
-                        pw.println("-----");
-                    } catch (IOException ioEx) {
-                        System.err.println("Could not write to errors.txt: " + ioEx.getMessage());
-                    }
-                }
+            PreparedStatement statement;
+            String sql = "INSERT INTO produkte (produkt_nr, titel, rating, verkaufsrang, bild, produkttyp) VALUES (?, ?, ?, ?, ?, ?)";
+            statement = conn.prepareStatement(sql);
+            statement.setString(1, produkt_nr);
+            statement.setString(2, titel);
+            statement.setFloat(3, rating);
+            statement.setInt(4, verkaufsrang);
+            statement.setString(5, bild);
+            statement.setString(6, produkttyp);
+            statement.executeUpdate();
+        } catch (SQLException e) {
+            try (FileWriter fw = new FileWriter("errors.txt", true);
+                    PrintWriter pw = new PrintWriter(fw)) {
+
+                pw.println("SQL error when inserting into produkte:");
+                pw.println("produkt_nr: " + produkt_nr);
+                pw.println("titel: " + titel);
+                pw.println("produkttyp: " + produkttyp);
+                pw.println("SQLState: " + e.getSQLState());
+                pw.println("Error Code: " + e.getErrorCode());
+                pw.println("Message: " + e.getMessage());
+                pw.println("-----");
+            } catch (IOException ioEx) {
+                System.err.println("Could not write to errors.txt: " + ioEx.getMessage());
+            }
+        }
     }
 
     public static int insertShop(
-    Connection conn,
-    String shopName,
-    int adressId
-    )throws SQLException, IOException{
+            Connection conn,
+            String shopName,
+            int adressId) throws SQLException, IOException {
         String sql = "INSERT INTO filialen (name, adress_id) VALUES (?, ?)";
-        
+
         try (
-            PreparedStatement statement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)
-        ) {
+                PreparedStatement statement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS)) {
             statement.setString(1, shopName);
             statement.setInt(2, adressId);
             statement.executeUpdate();
@@ -1017,7 +1015,7 @@ class XMLparser {
         } catch (SQLException e) {
             if ("23505".equals(e.getSQLState())) { // Unique constraint violation
                 try (FileWriter fw = new FileWriter("errors.txt", true);
-                    PrintWriter pw = new PrintWriter(fw)) {
+                        PrintWriter pw = new PrintWriter(fw)) {
                     pw.println("Duplicate key error when inserting into filialen:");
                     pw.println("shop: " + shopName);
                     pw.println("Error: " + e.getMessage());
@@ -1032,18 +1030,14 @@ class XMLparser {
         }
     }
 
-        
-    
-
     public static int insertAdress(
-        Connection conn,
-        String str,
-        String hausnummer,
-        String zusatz,
-        String zip,
-        String shopName
-    )throws SQLException{
-        //sql befehl insert into adressen straße, hausnummer, zusatz, plz, stadt
+            Connection conn,
+            String str,
+            String hausnummer,
+            String zusatz,
+            String zip,
+            String shopName) throws SQLException {
+        // sql befehl insert into adressen straße, hausnummer, zusatz, plz, stadt
         PreparedStatement statement;
         String sql = "INSERT INTO adressen (straße, hausnummer, zusatz, plz, stadt) VALUES (?, ?, ?, ?, ?)";
         statement = conn.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
@@ -1054,61 +1048,50 @@ class XMLparser {
         statement.setString(5, shopName);
         statement.executeUpdate();
         ResultSet adressSet = statement.getGeneratedKeys();
-        int adressId = -1; 
+        int adressId = -1;
         if (adressSet.next()) {
             adressId = adressSet.getInt(1);
             return adressId;
         } else {
             throw new SQLException("No address ID generated!");
-        } 
-    
+        }
+
     }
 
     public static void insertAngebot(
-        Connection conn, 
-        String produkt_nr,
-        int filiale_id,
-        Float preis, 
-        String zustand
-        )throws SQLException{
-             //sql befehl insert into adressen straße, hausnummer, zusatz, plz, stadt
-            try {
-                PreparedStatement statement;
-                String sql = "INSERT INTO angebote (produkt_nr, filiale_id, preis, zustand) VALUES (?, ?, ?::money, ?)";
-                statement = conn.prepareStatement(sql);
-                statement.setString(1, produkt_nr);
-                statement.setInt(2, filiale_id);
-                BigDecimal preisDecimal = BigDecimal.valueOf(preis);
-                statement.setBigDecimal(3, preisDecimal);
-                statement.setString(4, zustand);
-                statement.executeUpdate();
+            Connection conn,
+            String produkt_nr,
+            int filiale_id,
+            Float preis,
+            String zustand) throws SQLException {
+        // sql befehl insert into adressen straße, hausnummer, zusatz, plz, stadt
+        try {
+            PreparedStatement statement;
+            String sql = "INSERT INTO angebote (produkt_nr, filiale_id, preis, zustand) VALUES (?, ?, ?::money, ?)";
+            statement = conn.prepareStatement(sql);
+            statement.setString(1, produkt_nr);
+            statement.setInt(2, filiale_id);
+            BigDecimal preisDecimal = BigDecimal.valueOf(preis);
+            statement.setBigDecimal(3, preisDecimal);
+            statement.setString(4, zustand);
+            statement.executeUpdate();
 
-            } catch (SQLException e) {
-                // Foreign key violation
-                if ("23503".equals(e.getSQLState())) {
-                    try (FileWriter fw = new FileWriter("errors.txt", true);
+        } catch (SQLException e) {
+            // Foreign key violation
+            if ("23503".equals(e.getSQLState())) {
+                try (FileWriter fw = new FileWriter("errors.txt", true);
                         PrintWriter pw = new PrintWriter(fw)) {
-                        pw.println("Foreign key violation when inserting into angebote:");
-                        pw.println("produkt_nr: " + produkt_nr);
-                        pw.println("Error: " + e.getMessage());
-                        pw.println("-----");
-                    } catch (IOException ioEx) {
-                        System.err.println("Could not write to errors.txt: " + ioEx.getMessage());
-                    }
-                } else {
-                    throw e; // re-throw for all other SQL errors
+                    pw.println("Foreign key violation when inserting into angebote:");
+                    pw.println("produkt_nr: " + produkt_nr);
+                    pw.println("Error: " + e.getMessage());
+                    pw.println("-----");
+                } catch (IOException ioEx) {
+                    System.err.println("Could not write to errors.txt: " + ioEx.getMessage());
                 }
+            } else {
+                throw e; // re-throw for all other SQL errors
             }
-
         }
+
+    }
 }
-
-
-
-
-
-
-
-
-
-

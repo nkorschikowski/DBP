@@ -128,11 +128,47 @@
 -- -- SELECT * FROM cte_name; -- die kategorie wo oberkategorie = null
 
 
--- -- -- 11. Welche Produkte werden in allen Filialen angeboten?
--- -- -- Hinweis: Ihre Query muss so formuliert werden, dass sie für eine beliebige Anzahl von Filialen funktioniert.
--- -- -- Hinweis: Beachten Sie, dass ein Produkt mehrfach von einer Filiale angeboten werden kann (z.B. neu und gebraucht).
--- -- SELECT produkt_nr
--- -- FROM angebote
--- -- GROUP BY
+-- 11. Welche Produkte werden in allen Filialen angeboten?
+-- Hinweis: Ihre Query muss so formuliert werden, dass sie für eine beliebige Anzahl von Filialen funktioniert.
+-- Hinweis: Beachten Sie, dass ein Produkt mehrfach von einer Filiale angeboten werden kann (z.B. neu und gebraucht).
+-- PASST (sind aber nur 2)
+WITH numfil AS ( -- PASST
+  SELECT count(*)
+  FROM (SELECT filiale_id
+        FROM angebote
+        GROUP BY filiale_id)
+  ),
+  ohneZustand AS ( -- PASST
+    SELECT produkt_nr, filiale_id
+    FROM angebote
+    GROUP BY produkt_nr, filiale_id
+  ),
+  frageELF AS ( --fürs nächste
+  SELECT produkt_nr, count(*)
+FROM ohneZustand
+GROUP BY produkt_nr
+HAVING count(*) = (Select * from numfil)
+)
+
+-- -- SELECT produkt_nr, count(*)
+-- -- FROM ohneZustand
+-- -- GROUP BY produkt_nr
+-- -- HAVING count(*) = (Select * from numfil)
+
+
 
 -- -- -- 12. In wieviel Prozent der Fälle der Frage 11 gibt es in Leipzig das preiswerteste Angebot?
+-- WITH frageELF AS (
+--   SELECT produkt_nr, count(*)
+-- FROM ohneZustand
+-- GROUP BY produkt_nr
+-- HAVING count(*) = (Select * from numfil)
+-- )
+
+SELECT angebote.produkt_nr, MIN(preis)
+FROM frageELF JOIN angebote ON frageELF.produkt_nr = angebote.produkt_nr
+GROUP BY angebote.produkt_nr
+
+das jetzt wieder joinen mit preis und produkt gleich
+
+
