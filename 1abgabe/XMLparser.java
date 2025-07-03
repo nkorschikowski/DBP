@@ -202,9 +202,10 @@ class XMLparser {
                             try {
                                 String preisString = sb.toString().trim();
                                 if (preisString.isEmpty()) {
-                                    throw new NumberFormatException("Empty price value");
+                                    preis = 0;
+                                } else {
+                                    preis = Integer.parseInt(preisString);
                                 }
-                                preis = Integer.parseInt(preisString);
                             } catch (NumberFormatException e) {
                                 try (FileWriter fw = new FileWriter("errors.txt", true);
                                         PrintWriter pw = new PrintWriter(fw)) {
@@ -363,7 +364,7 @@ class XMLparser {
                                     System.err.println("Invalid time: " + sb.toString().trim() + produkt_nr);
                                 }
                             } else {
-                                laufzeit = null;
+                                laufzeit = LocalTime.MIDNIGHT;
                             }
                             break;
 

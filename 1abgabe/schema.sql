@@ -10,7 +10,6 @@ DROP TABLE IF EXISTS autoren_buecher CASCADE;
 DROP TABLE IF EXISTS kuenstler_cds CASCADE;
 DROP TABLE IF EXISTS dvd_personen CASCADE;
 DROP TABLE IF EXISTS kategorien CASCADE;
-DROP TABLE IF EXISTS unterkategorie CASCADE;
 DROP TABLE IF EXISTS produkt_kategorie CASCADE;
 DROP TABLE IF EXISTS aehnliche_produkte CASCADE;
 DROP TABLE IF EXISTS filialen CASCADE;
@@ -26,7 +25,7 @@ CREATE TABLE produkte (
   produkt_nr varchar(255) PRIMARY KEY, -- asin
   titel varchar(255) NOT NULL,
   rating float, -- wird durch TRIGGER bei INSERT, UPDATE, DELETE in 'rezensionen' aktualisiert
-  verkaufsrang integer UNIQUE, -- nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
+  verkaufsrang integer, -- nicht NOT NULL, weil es villecht mehrer Produkte gibt, die noch nie verkauft wurden
   bild varchar(500),
   produkttyp varchar(255),
 

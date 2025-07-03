@@ -117,58 +117,88 @@
 -- -- -- 10. Für welche Produkte gibt es ähnliche Produkte in einer anderen Hauptkategorie?
 -- -- -- Hinweis: Eine Hauptkategorie ist eine Produktkategorie ohne Oberkategorie.
 -- -- -- Erstellen Sie eine rekursive Anfrage, die zu jedem Produkt dessen Hauptkategorie bestimmt.
--- -- WITH RECURSIVE hauptkategorie
--- -- AS (
--- -- -- Base case
--- -- SELECT -- kategorie des produkts
--- -- UNION ALL
--- -- -- Recursive case
--- -- SELECT ...     -- alle überkatorien
--- -- FROM cte_name ... )
--- -- SELECT * FROM cte_name; -- die kategorie wo oberkategorie = null
 
+WITH RECURSIVE hauptkategorien AS (
+  SELECT
+    kategorie_id,
+    kategorie_id AS hauptkategorie_id
+  FROM kategorien
+  WHERE oberkategorie_id IS 0
 
--- 11. Welche Produkte werden in allen Filialen angeboten?
--- Hinweis: Ihre Query muss so formuliert werden, dass sie für eine beliebige Anzahl von Filialen funktioniert.
--- Hinweis: Beachten Sie, dass ein Produkt mehrfach von einer Filiale angeboten werden kann (z.B. neu und gebraucht).
--- PASST (sind aber nur 2)
-WITH numfil AS ( -- PASST
-  SELECT count(*)
-  FROM (SELECT filiale_id
-        FROM angebote
-        GROUP BY filiale_id)
-  ),
-  ohneZustand AS ( -- PASST
-    SELECT produkt_nr, filiale_id
-    FROM angebote
-    GROUP BY produkt_nr, filiale_id
-  ),
-  frageELF AS ( --fürs nächste
-  SELECT produkt_nr, count(*)
-FROM ohneZustand
-GROUP BY produkt_nr
-HAVING count(*) = (Select * from numfil)
+  UNION ALL
+
+  SELECT
+    k.kategorie_id,
+    hk.hauptkategorie_id
+  FROM kategorien k
+  JOIN hauptkategorien hk ON k.oberkategorie_id = hk.kategorie_id
+),
+
+produkt_hauptkategorien AS (
+  SELECT
+    pk.produkt_nr,
+    hk.hauptkategorie_id
+  FROM produkt_kategorie pk
+  JOIN hauptkategorien hk ON pk.kategorie_id = hk.kategorie_id
+),
+
+aehnlichkeiten AS (
+  SELECT produkt_nr1 AS p1, produkt_nr2 AS p2 FROM aehnliche_produkte
+  UNION
+  SELECT produkt_nr2 AS p1, produkt_nr1 AS p2 FROM aehnliche_produkte
 )
 
--- -- SELECT produkt_nr, count(*)
+SELECT DISTINCT
+  a.p1 AS produkt,
+  a.p2 AS aehnliches_produkt
+FROM aehnlichkeiten a
+JOIN produkt_hauptkategorien ph1 ON a.p1 = ph1.produkt_nr
+JOIN produkt_hauptkategorien ph2 ON a.p2 = ph2.produkt_nr
+WHERE ph1.hauptkategorie_id IS DISTINCT FROM ph2.hauptkategorie_id
+ORDER BY produkt, aehnliches_produkt;
+
+
+-- -- -- 11. Welche Produkte werden in allen Filialen angeboten?
+-- -- -- Hinweis: Ihre Query muss so formuliert werden, dass sie für eine beliebige Anzahl von Filialen funktioniert.
+-- -- -- Hinweis: Beachten Sie, dass ein Produkt mehrfach von einer Filiale angeboten werden kann (z.B. neu und gebraucht).
+-- -- -- PASST (sind aber nur 2)
+-- -- WITH numfil AS ( -- PASST
+-- --   SELECT count(*)
+-- --   FROM (SELECT filiale_id
+-- --         FROM angebote
+-- --         GROUP BY filiale_id)
+-- --   ),
+-- --   ohneZustand AS ( -- PASST
+-- --     SELECT produkt_nr, filiale_id
+-- --     FROM angebote
+-- --     GROUP BY produkt_nr, filiale_id
+-- --   ),
+-- --   frageELF AS ( --fürs nächste
+-- --   SELECT produkt_nr, count(*)
 -- -- FROM ohneZustand
 -- -- GROUP BY produkt_nr
 -- -- HAVING count(*) = (Select * from numfil)
+-- -- )
+
+-- -- -- -- -- SELECT produkt_nr, count(*)
+-- -- -- -- -- FROM ohneZustand
+-- -- -- -- -- GROUP BY produkt_nr
+-- -- -- -- -- HAVING count(*) = (Select * from numfil)
 
 
 
--- -- -- 12. In wieviel Prozent der Fälle der Frage 11 gibt es in Leipzig das preiswerteste Angebot?
--- WITH frageELF AS (
---   SELECT produkt_nr, count(*)
--- FROM ohneZustand
--- GROUP BY produkt_nr
--- HAVING count(*) = (Select * from numfil)
--- )
+-- -- -- -- 12. In wieviel Prozent der Fälle der Frage 11 gibt es in Leipzig das preiswerteste Angebot?
+-- -- -- -- WITH frageELF AS (
+-- -- -- --   SELECT produkt_nr, count(*)
+-- -- -- -- FROM ohneZustand
+-- -- -- -- GROUP BY produkt_nr
+-- -- -- -- HAVING count(*) = (Select * from numfil)
+-- -- -- -- )
 
-SELECT angebote.produkt_nr, MIN(preis)
-FROM frageELF JOIN angebote ON frageELF.produkt_nr = angebote.produkt_nr
-GROUP BY angebote.produkt_nr
+-- -- SELECT angebote.produkt_nr, MIN(preis)
+-- -- FROM frageELF JOIN angebote ON frageELF.produkt_nr = angebote.produkt_nr
+-- -- GROUP BY angebote.produkt_nr
 
-das jetzt wieder joinen mit preis und produkt gleich
+-- -- -- das jetzt wieder joinen mit preis und produkt gleich
 
 
