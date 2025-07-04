@@ -117,6 +117,9 @@
 -- -- -- 10. Für welche Produkte gibt es ähnliche Produkte in einer anderen Hauptkategorie?
 -- -- -- Hinweis: Eine Hauptkategorie ist eine Produktkategorie ohne Oberkategorie.
 -- -- -- Erstellen Sie eine rekursive Anfrage, die zu jedem Produkt dessen Hauptkategorie bestimmt.
+-- -- -- sieht gut aus, allerdings werden alle produkt/ähnliche_produkte angezeit wodurch duplikate entstehen:
+-- -- -- -- fix: die spalte für das ähnliche produkt zu entfernen (Ergebnis: 748)
+
 
 WITH RECURSIVE hauptkategorien AS (
   SELECT
@@ -150,12 +153,12 @@ aehnlichkeiten AS (
 
 SELECT DISTINCT
   a.p1 AS produkt,
-  a.p2 AS aehnliches_produkt
+  -- a.p2 AS aehnliches_produkt 
 FROM aehnlichkeiten a
 JOIN produkt_hauptkategorien ph1 ON a.p1 = ph1.produkt_nr
 JOIN produkt_hauptkategorien ph2 ON a.p2 = ph2.produkt_nr
 WHERE ph1.hauptkategorie_id IS DISTINCT FROM ph2.hauptkategorie_id
-ORDER BY produkt, aehnliches_produkt;
+ORDER BY produkt; -- , aehnliches_produkt;
 
 
 -- -- -- 11. Welche Produkte werden in allen Filialen angeboten?
