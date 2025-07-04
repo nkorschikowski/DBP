@@ -118,47 +118,43 @@
 -- -- -- Hinweis: Eine Hauptkategorie ist eine Produktkategorie ohne Oberkategorie.
 -- -- -- Erstellen Sie eine rekursive Anfrage, die zu jedem Produkt dessen Hauptkategorie bestimmt.
 -- -- -- sieht gut aus, allerdings werden alle produkt/ähnliche_produkte angezeit wodurch duplikate entstehen:
--- -- -- -- fix: die spalte für das ähnliche produkt zu entfernen (Ergebnis: 748)
+-- -- -- -- fix: die spalte für das ähnliche produkt zu entfernen (Ergebnis: 748) ich hatte 508
 
 
 WITH RECURSIVE hauptkategorien AS (
-  SELECT
-    kategorie_id,
-    kategorie_id AS hauptkategorie_id
-  FROM kategorien
-  WHERE oberkategorie_id IS 0
+SELECT
+  kategorie_id,
+  kategorie_id AS hauptkategorie_id
+FROM kategorien
+WHERE oberkategorie_id IS NULL
 
-  UNION ALL
+UNION ALL
 
-  SELECT
-    k.kategorie_id,
-    hk.hauptkategorie_id
-  FROM kategorien k
-  JOIN hauptkategorien hk ON k.oberkategorie_id = hk.kategorie_id
+SELECT
+  k.kategorie_id,
+  hk.hauptkategorie_id
+FROM kategorien k
+JOIN hauptkategorien hk ON k.oberkategorie_id = hk.kategorie_id
 ),
-
 produkt_hauptkategorien AS (
   SELECT
-    pk.produkt_nr,
+    p.produkt_nr,
     hk.hauptkategorie_id
-  FROM produkt_kategorie pk
-  JOIN hauptkategorien hk ON pk.kategorie_id = hk.kategorie_id
+  FROM produkt_kategorie p
+  JOIN hauptkategorien hk ON p.kategorie_id = hk.kategorie_id
 ),
-
-aehnlichkeiten AS (
+aehnlich AS (
   SELECT produkt_nr1 AS p1, produkt_nr2 AS p2 FROM aehnliche_produkte
   UNION
   SELECT produkt_nr2 AS p1, produkt_nr1 AS p2 FROM aehnliche_produkte
 )
 
-SELECT DISTINCT
-  a.p1 AS produkt,
-  -- a.p2 AS aehnliches_produkt 
-FROM aehnlichkeiten a
+SELECT DISTINCT a.p1 AS produkt
+FROM aehnlich a
 JOIN produkt_hauptkategorien ph1 ON a.p1 = ph1.produkt_nr
 JOIN produkt_hauptkategorien ph2 ON a.p2 = ph2.produkt_nr
 WHERE ph1.hauptkategorie_id IS DISTINCT FROM ph2.hauptkategorie_id
-ORDER BY produkt; -- , aehnliches_produkt;
+ORDER BY produkt;
 
 
 -- -- -- 11. Welche Produkte werden in allen Filialen angeboten?

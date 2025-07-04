@@ -1,6 +1,7 @@
 .vscode/
 test
 *.properties
+error.txt
 errors.txt
 CSVabgelehnt.txt
 log.txt
