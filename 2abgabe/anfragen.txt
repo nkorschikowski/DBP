@@ -1,16 +1,21 @@
--- 1. Wieviele Produkte jeden Typs (Buch, Musik-CD, DVD) sind in der Datenbank erfasst? 
--- Hinweis: Geben Sie das Ergebnis in einer 3-spaltigen Relation aus
+-- 1. Wieviele Produkte jeden Typs (Buch, Musik-CD, DVD) sind in der Datenbank erfasst? Hinweis: Geben Sie das Ergebnis in einer 3-spaltigen Relation aus
 
 SELECT
-  (SELECT count(*) FROM buecher) AS Bücher,       -- 625
-  (SELECT count(*) FROM musikcds) AS Musik_CDs,   -- 1581
-  (SELECT count(*) FROM dvds) AS DVDs             -- 582
+  (SELECT count(*) FROM buecher) AS Bücher,
+  (SELECT count(*) FROM musikcds) AS Musik_CDs,
+  (SELECT count(*) FROM dvds) AS DVDs  
+
+  ERGEBNIS:
+Bücher  Musik_CDs   DVDs
+-------------------------
+625     1581        582
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 2. Nennen Sie die 5 besten Produkte jedes Typs (Buch, Musik-CD, DVD) sortiert nach dem durchschnittlichem Rating.
 -- Hinweis: Geben Sie das Ergebnis in einer einzigen Relation mit den Attributen Typ, ProduktNr, Rating aus.
 -- Wie werden gleiche durchschnittliche Ratings behandelt?
 
--- TODO: Ist die Anfrage vielleicht doch so zu verstehen, dass die die Reihenfolge der 15 Objekte durchmischt sein darf? Gerade sinds ja erst 5 Bücher, dann 5 DVDs dann 5 CDs.
 (SELECT p.produkttyp AS Typ, p.produkt_nr AS ProduktNr, p.rating AS Rating, count(r.person_id) AS count
 FROM produkte p NATURAL JOIN rezensionen r 
 WHERE produkttyp = 'Book' 
@@ -29,7 +34,25 @@ WHERE produkttyp = 'DVD'
 GROUP BY p.produkt_nr
 ORDER BY rating DESC, count DESC LIMIT 5)
 
+Typ     ProduktNr   Rating count
+---------------------------------
+Book	343103196X	5	    5
+Book	3453137442	5	    5
+Book	3453867920	5	    5
+Book	3522177347	5	    5
+Book	3895927805	5	    5
+DVD 	B00005NMYY	5	    5
+DVD	    B00005T7AQ	5	    5
+DVD	    B0009HL8EQ	5	    5
+DVD	    B0009VJVJG	5	    5
+DVD	    B000BRBH90	5	    5
+Music	B00000I92V	5   	5
+Music	B00000IGPN	5	    5
+Music	B00000JAD4	5	    5
+Music	B0000DYMRN	5   	5
+Music	B0002H24MS	5	    5
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 3. Für welche Produkte gibt es im Moment kein Angebot?
 
@@ -37,26 +60,23 @@ SELECT produkt_nr, titel
 FROM produkte
 WHERE produkt_nr NOT IN
 (SELECT produkt_nr FROM angebote)
-  -- 1992 Ergebnisse
 
--- WIE VIELE sind das 
--- SELECT count(*) FROM
--- (SELECT produkt_nr, titel
--- FROM produkte
--- WHERE produkt_nr NOT IN
--- (SELECT produkt_nr FROM angebote))
+1992 Ergebnisse ... 
 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 4. Für welche Produkte ist das teuerste Angebot mehr als doppelt so teuer wie das preiswerteste?
 
--- TODO: kein Ergebniss, weil kein Produkt mehrer Angebote hat
 SELECT produkt_nr
 FROM angebote
 GROUP BY produkt_nr
   HAVING MAX(preis) > 2 * MIN(preis);
--- leer
+
+leer
 
 
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 5. Welche Produkte haben sowohl mindestens eine sehr schlechte (Punktzahl: 1) als auch mindestens eine sehr gute (Punktzahl: 5) Bewertung?
 
@@ -66,16 +86,138 @@ FROM
 NATURAL JOIN
 (SELECT produkt_nr FROM rezensionen WHERE bewertung = 5 GROUP BY produkt_nr) AS fuenf
 GROUP BY produkt_nr
--- 114 Ergebnisse
 
+114 Ergebnisse
+
+produkt_nr
+----------
+B0002ZCJM0
+B00064HR0Q
+B000BKSHIG
+B000A3VTXY
+B0000CGV49
+B000B9UHRG
+3800051680
+B0007SK9OM
+3522177622
+3937825061
+B0000A01J6
+B00006LJ95
+B000024BDU
+B00005RDSY
+3440102092
+B00004NHJZ
+3765323063
+B00006RYOL
+3791504649
+B0006BLIZ4
+B00065VU7G
+3800051753
+3785714130
+3789140244
+B00005QZGP
+B0000256TO
+389830695X
+B0002UYA86
+B0007QCGT0
+3833930136
+B00004WIID
+B000BKHF9I
+B00005UJYW
+3800050870
+B0007YMS2W
+B00009YNGB
+B0006H2UR8
+B0002SLP2W
+B000094HLD
+B000AQBALW
+3937825134
+B0000241WM
+3401058371
+B0007WD8BY
+3466457513
+3451280000
+B00007KGAO
+3423055960
+3897771136
+3570215075
+B0001U1PYO
+B00005S6LX
+B000C4JTT2
+B000003FOE
+B00005JIJT
+B00002695C
+B000025SZ0
+3866151101
+B00004WI74
+3937825045
+3800050889
+3791504657
+3473520284
+B000679QWA
+B000AGK83S
+3833211385
+B0008EI7RQ
+398081890X
+3570016943
+B0007R8A9O
+B0000DJURY
+3593375559
+B0000B0A0T
+B000002VC5
+B0009ENFW2
+B000AGK9UU
+B00006RJSG
+B0000261OB
+B0009WFS2E
+B0001CKQXS
+3593373912
+B00008OES9
+3898303039
+3520452030
+B0007VCZ50
+B0000505HK
+B00002S5DF
+B00009AHNC
+B0000CAXIE
+3821229268
+B0002S30NE
+B0000CDUJT
+B00009AHN2
+B00001SIBN
+B0006B969E
+3468266251
+B0000CGP44
+B0009U55PG
+3802533976
+B00006J9TY
+B000005E4I
+B00008Y4KY
+B00005TQ47
+B0001ELYGO
+3870676590
+3551552002
+B00007BHME
+B00009LI6V
+B000AANBG0
+3551552533
+B0007VCV68
+B000BSNPR6
+3190028516
+3440102076
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 6. Für wieviele Produkte gibt es gar keine Rezension?
 
 SELECT count(*)
 FROM produkte
 WHERE produkt_nr NOT IN (SELECT DISTINCT produkt_nr FROM rezensionen)
--- 1003
 
+Ergebnis: 1003
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 7. Nennen Sie alle Rezensenten, die mindestens 10 Rezensionen geschrieben haben.
 
@@ -83,8 +225,19 @@ SELECT name
 FROM rezensionen NATURAL JOIN personen
 GROUP BY name
   HAVING COUNT(person_id) >= 10
--- 6 Ergebnisse
 
+6 Ergebnisse
+
+name
+-----
+guest
+vspillner
+petethemusicfan
+media-maniade
+katja-lesemaus
+m_oehri_stadtmagazine
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 8. Geben Sie eine duplikatfreie und alphabetisch sortierte Liste der Namen aller Buchautoren an, die auch an DVDs oder Musik-CDs beteiligt sind.
 
@@ -93,7 +246,34 @@ FROM autoren_buecher NATURAL JOIN personen
 WHERE person_id IN (SELECT person_id FROM kuenstler_cds)
 OR person_id IN (SELECT person_id FROM dvd_personen)
 ORDER BY name
--- 20 Ergebnisse
+
+20 Ergebnisse
+
+name
+-----
+Ac
+Al
+Brun
+Daniel Defoe
+Dav
+Dietmar Mues
+Heino
+Johann Sebastian Bach
+Jürgen
+Korn
+Leonard Bernstein
+Nas
+Nicole
+Peter
+Robin
+Sandra
+Va
+Wolfgang Amadeus Mozart
+Xavier N
+Xavier Naidoo
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 9. Wie hoch ist die durchschnittliche Anzahl von Liedern einer Musik-CD?
 
@@ -102,15 +282,11 @@ FROM (
 SELECT COUNT(titel_id) AS count
 FROM titel
 GROUP BY produkt_nr)
--- 22.2379696769940672
 
--- TODO: gibt es produkte ohne titel?
--- SELECT * FROM (
--- SELECT count(titel_id) AS counter
--- FROM titel
--- GROUP BY produkt_nr)
--- WHERE counter = 0
+Ergebnis: 22.2379696769940672
 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 10. Für welche Produkte gibt es ähnliche Produkte in einer anderen Hauptkategorie?
 -- Hinweis: Eine Hauptkategorie ist eine Produktkategorie ohne Oberkategorie.
@@ -144,8 +320,11 @@ JOIN produkt_hauptkategorien ph1 ON a.p1 = ph1.produkt_nr
 JOIN produkt_hauptkategorien ph2 ON a.p2 = ph2.produkt_nr
 WHERE ph1.hauptkategorie_id IS DISTINCT FROM ph2.hauptkategorie_id
 ORDER BY produkt;
--- habe ich kein Ergbenis weil bei mir der python kategorie Parser wieder nicht ging
 
+Ergebnisse
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 11. Welche Produkte werden in allen Filialen angeboten?
 -- Hinweis: Ihre Query muss so formuliert werden, dass sie für eine beliebige Anzahl von Filialen funktioniert.
@@ -167,8 +346,40 @@ SELECT produkt_nr
 FROM ohneZustand
 GROUP BY produkt_nr
 HAVING count(*) = (Select * from numfil)
--- 25
 
+
+25 Ergebnisse
+
+produkt_nr
+-----------
+B000005GWE
+B0007WRTAA
+B00005UMTW
+B0009WPCJS
+B000BW9BKC
+B000BAVWA6
+B00000JODW
+B00014AW6C
+B00002DGW7
+B0002PZWQ0
+B00004W55E
+B0009MWB60
+B0002TB60W
+B00005UW50
+B0002Z9ZCW
+B000BFHW1O
+B000B6VUAW
+B000ANPWYG
+B000BFHW1E
+B000B2WK8M
+B0002WS3M8
+B0009SQ6YW
+B00007B6WD
+B0008GIXDW
+B00069KW58
+
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 -- 12. In wieviel Prozent der Fälle der Frage 11 gibt es in Leipzig das preiswerteste Angebot?
 
@@ -204,11 +415,4 @@ WITH numfil AS (
 
   SELECT 100.0 * (SELECT count(*) FROM minprod_leipzig) / (SELECT count(*) FROM frageELF)
 
-  -- 56.0000000000000000
-  
-
-
-
-
-
-
+  Ergebnis: 56.0000000000000000
