@@ -2,9 +2,9 @@
 -- Hinweis: Geben Sie das Ergebnis in einer 3-spaltigen Relation aus
 
 SELECT
-  (SELECT count(*) FROM buecher) AS Bücher,       -- 625
-  (SELECT count(*) FROM musikcds) AS Musik_CDs,   -- 1581
-  (SELECT count(*) FROM dvds) AS DVDs             -- 582
+  (SELECT count(*) FROM buecher) AS Bücher,       -- 625 -- 649
+  (SELECT count(*) FROM musikcds) AS Musik_CDs,   -- 1581 -- 1435
+  (SELECT count(*) FROM dvds) AS DVDs             -- 582 -- 657
 
 -- 2. Nennen Sie die 5 besten Produkte jedes Typs (Buch, Musik-CD, DVD) sortiert nach dem durchschnittlichem Rating.
 -- Hinweis: Geben Sie das Ergebnis in einer einzigen Relation mit den Attributen Typ, ProduktNr, Rating aus.
@@ -37,9 +37,9 @@ SELECT produkt_nr, titel
 FROM produkte
 WHERE produkt_nr NOT IN
 (SELECT produkt_nr FROM angebote)
-  -- 1992 Ergebnisse
+  -- 1992 Ergebnisse (1853)
 
--- WIE VIELE sind das 
+-- WIE VIELE sind das (auch 1853)
 -- SELECT count(*) FROM
 -- (SELECT produkt_nr, titel
 -- FROM produkte
@@ -55,6 +55,7 @@ FROM angebote
 GROUP BY produkt_nr
   HAVING MAX(preis) > 2 * MIN(preis);
 -- leer
+-- eines: B00004CWTY
 
 
 
@@ -66,7 +67,7 @@ FROM
 NATURAL JOIN
 (SELECT produkt_nr FROM rezensionen WHERE bewertung = 5 GROUP BY produkt_nr) AS fuenf
 GROUP BY produkt_nr
--- 114 Ergebnisse
+-- 114 Ergebnisse (128)
 
 
 -- 6. Für wieviele Produkte gibt es gar keine Rezension?
@@ -74,7 +75,7 @@ GROUP BY produkt_nr
 SELECT count(*)
 FROM produkte
 WHERE produkt_nr NOT IN (SELECT DISTINCT produkt_nr FROM rezensionen)
--- 1003
+-- 1003 (722)
 
 
 -- 7. Nennen Sie alle Rezensenten, die mindestens 10 Rezensionen geschrieben haben.
@@ -83,7 +84,7 @@ SELECT name
 FROM rezensionen NATURAL JOIN personen
 GROUP BY name
   HAVING COUNT(person_id) >= 10
--- 6 Ergebnisse
+-- 6 Ergebnisse (6)
 
 
 -- 8. Geben Sie eine duplikatfreie und alphabetisch sortierte Liste der Namen aller Buchautoren an, die auch an DVDs oder Musik-CDs beteiligt sind.
@@ -93,7 +94,7 @@ FROM autoren_buecher NATURAL JOIN personen
 WHERE person_id IN (SELECT person_id FROM kuenstler_cds)
 OR person_id IN (SELECT person_id FROM dvd_personen)
 ORDER BY name
--- 20 Ergebnisse
+-- 20 Ergebnisse (19)
 
 -- 9. Wie hoch ist die durchschnittliche Anzahl von Liedern einer Musik-CD?
 
@@ -103,7 +104,8 @@ SELECT COUNT(titel_id) AS count
 FROM titel
 GROUP BY produkt_nr)
 -- 22.2379696769940672
-
+-- 23.2005856515373353
+  
 -- TODO: gibt es produkte ohne titel?
 -- SELECT * FROM (
 -- SELECT count(titel_id) AS counter
@@ -145,6 +147,7 @@ JOIN produkt_hauptkategorien ph2 ON a.p2 = ph2.produkt_nr
 WHERE ph1.hauptkategorie_id IS DISTINCT FROM ph2.hauptkategorie_id
 ORDER BY produkt;
 -- habe ich kein Ergbenis weil bei mir der python kategorie Parser wieder nicht ging
+-- 748 sind s bei mir
 
 
 -- 11. Welche Produkte werden in allen Filialen angeboten?
@@ -168,7 +171,7 @@ FROM ohneZustand
 GROUP BY produkt_nr
 HAVING count(*) = (Select * from numfil)
 -- 25
-
+-- 111
 
 -- 12. In wieviel Prozent der Fälle der Frage 11 gibt es in Leipzig das preiswerteste Angebot?
 
@@ -205,7 +208,7 @@ WITH numfil AS (
   SELECT 100.0 * (SELECT count(*) FROM minprod_leipzig) / (SELECT count(*) FROM frageELF)
 
   -- 56.0000000000000000
-  
+  -- 48.6486486486486486
 
 
 
