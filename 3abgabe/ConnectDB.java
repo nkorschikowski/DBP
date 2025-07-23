@@ -66,5 +66,23 @@ public class ConnectDB {
 
     }
 
+    public void saveObject(
+        Session session
+    ){
+        
+        Produkte produkt = new Produkte("testid",
+        "testprodukt",
+        0.5f,
+        42,
+        "testbildurl",
+        "Book");
+
+        session.beginTransaction();
+
+        session.persist(produkt);
+
+        session.getTransaction().commit();
+    }
+
     
 }
