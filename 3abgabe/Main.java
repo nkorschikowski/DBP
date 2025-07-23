@@ -14,7 +14,8 @@ public class Main {
         System.out.println("Connected to the database...");
 
         ConnectDB db = new ConnectDB();
-        db.deleteTable(session, "test_coloumn");
+        
+        db.saveObject(session);
         
 
 
