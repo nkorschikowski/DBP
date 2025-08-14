@@ -290,30 +290,126 @@ def dresdi_insertDvd(conn, item):
 def leipzi_similars(conn, item):
     try:
         cur = conn.cursor()
-        insert_query = "INSERT INTO aehnliche_produkte (produkt_nr, produkt_nr2) VALUES (%s, %s);"
+        insert_query = "INSERT INTO aehnliche_produkte (produkt_nr1, produkt_nr2) VALUES (%s, %s);"
         produkt_nr = item.get('asin', 'unknown')
         for similar in item.find_all('sim_product'):
             produkt_nr2 = similar.find('asin').text
             cur.execute(insert_query, (produkt_nr, produkt_nr2))
-        conn.commit()
+            conn.commit()
     except Exception as error:
         with open("error.txt", "a") as error_file:
             error_file.write(f"Error inserting similars: {error}\n")
         print(f"Error inserting similars: {error}")
+        conn.rollback()
 
 
 ##### Einfügen der ähnlichen Produkte in die Tabelle similars ###
 def dresdi_similars(conn, item):
     try:
         cur = conn.cursor()
-        insert_query = "INSERT INTO aehnliche_produkte (produkt_nr, produkt_nr2) VALUES (%s, %s);"
+        insert_query = "INSERT INTO aehnliche_produkte (produkt_nr1, produkt_nr2) VALUES (%s, %s);"
         produkt_nr = item.get('asin', 'unknown')
         for similar in item.find('similars').find_all('item'):
             produkt_nr2 = similar['asin']
             cur.execute(insert_query, (produkt_nr, produkt_nr2))
-        conn.commit()
+            conn.commit()
     except Exception as error:
         with open("error.txt", "a") as error_file:
             error_file.write(f"Error inserting similars: {error}\n")
         print(f"Error inserting similars: {error}")
+        conn.rollback()
 
+def angebot(conn, item, filiale):
+    try:
+        cur = conn.cursor()
+        insert_query = "INSERT INTO angebote (produkt_nr,  filiale_id, preis, zustand) VALUES (%s, %s, %s, %s);"
+        produkt_nr = item.get('asin', 'unknown')
+        cur.execute("SELECT filiale_id FROM filialen WHERE name=%s;", (filiale,))
+        filiale_id = cur.fetchone()
+        mult = float(item.find("price")['mult']) if item.find("price")['mult'] and item.find("price")['mult'].strip() else 0.0
+        value = float(item.find("price").text) if item.find("price").text and item.find("price").text.strip()  else 0.0
+        preis = mult * value
+        zustand = item.find("price")['state'] if item.find("price")['state'] and item.find("price")['state'].strip() else 'unknown' 
+        cur.execute(insert_query, (produkt_nr, filiale_id, preis, zustand))
+        conn.commit()
+
+    except Exception as error:
+        with open("error.txt", "a") as error_file:
+            error_file.write(f"Error inserting angebot: {error}\n")
+        print(f"Error inserting angebot: {error}")
+        conn.rollback()
+
+def shop(conn, shop):
+    try:
+        cur = conn.cursor()
+        insert_query= "INSERT INTO filialen (name, adress_id) VALUES (%s, %s)"
+        filiale_name = shop.find('shop').get('name')
+        cur.execute("SELECT adress_id FROM adressen WHERE stadt=%s;", (filiale_name,))
+        adress_id = cur.fetchone()
+        cur.execute(insert_query, (filiale_name, adress_id[0],))
+        conn.commit()
+
+    except Exception as error:
+        with open("error.text", "a") as error_file:
+            error_file.write(f"Error inserting shop: {error}\n")
+        print(f"Error inserting shop: {error}")
+        conn.rollback()
+
+def adresse(conn, shop):
+    try:
+        cur = conn.cursor()
+        insert_query= "INSERT INTO adressen (straße, hausnummer, zusatz, plz, stadt) VALUES (%s, %s, %s, %s, %s)"
+        shop = shop.find('shop')
+        straße = shop['street']
+        hausnummer = 1
+        zusatz = "empty"
+        plz = shop['zip']
+        stadt = shop['name']
+        cur.execute(insert_query, (straße, hausnummer, zusatz, plz, stadt))
+        conn.commit()
+
+
+    except Exception as error:
+        with open('error.text', 'a') as error_file:
+            error_file.write(f'Error inserting adress: {error}\n')
+        print(f'Error inserting adress: {error}\n')
+        conn.rollback()
+
+def personen(conn, item):
+    try:
+        cur = conn.cursor()
+        insert_query= "INSERT INTO personen (name) VALUES (%s)";
+        person_list = [tag['name'] for tag in item.find_all(name=["author", "artist", "actor", "creator", "director"]) if tag.has_attr('name')] or None
+        if person_list:    
+            for person in person_list:
+                cur.execute(insert_query, (person,))
+                conn.commit()
+
+    except Exception as error:
+        with open('error.text', 'a') as error_file:
+            error_file.write(F"Error inserting person: {error}\n")
+        print(f"Error inserting person: {error}")
+        conn.rollback()
+
+def personen_produkt(conn, item):
+    try:   
+        cor = conn.cursor()
+        produkttyp = item['pgroup'] if item['pgroup'] is not "" else None
+        if produkttyp == "DVD":
+            insert_query= "INSERT INTO dvd_personen (produkt_nr, person_id, rolle) VALUES (?, ?, ?)";
+        
+
+        elif produkttyp == "Music":
+            insert_query= "INSERT INTO kuenstler_cds (produkt_nr, person_id) VALUES (?,?)";
+        
+
+        elif produkttyp == "Book":
+            "INSERT INTO autoren_buecher (produkt_nr, person_id) VALUES (?,?)";
+
+        else None
+    
+    except Exception as error:
+        with open('error.text', 'a') as error_file:
+            error_file.write(f"Error inserting produkt_person: {error}\n")
+        print(f"Error inserting person: {error}")
+        conn.rollback()
