@@ -375,13 +375,14 @@ def adresse(conn, shop):
         print(f'Error inserting adress: {error}\n')
         conn.rollback()
 
-def personen(conn, item):
+def leipzi_personen(conn, item):
     try:
         cur = conn.cursor()
         insert_query= "INSERT INTO personen (name) VALUES (%s)";
-        person_list = [tag['name'] for tag in item.find_all(name=["author", "artist", "actor", "creator", "director"]) if tag.has_attr('name')] or None
+        person_list = [tag['name'].strip()  for tag in item.find_all(name=["author", "artist", "actor", "director"]) if tag.has_attr('name')] or None
         if person_list:    
             for person in person_list:
+                print(person)
                 cur.execute(insert_query, (person,))
                 conn.commit()
 
@@ -391,25 +392,128 @@ def personen(conn, item):
         print(f"Error inserting person: {error}")
         conn.rollback()
 
-def personen_produkt(conn, item):
+def dresdi_personen(conn, item):
+    try:
+        cur = conn.cursor()
+        insert_query= "INSERT INTO personen (name) VALUES (%s)";
+        person_list = [tag.text.strip()  for tag in item.find_all(["author", "artist", "actor", "director"])] or None
+        if person_list:    
+            for person in person_list:
+                print(person)
+                cur.execute(insert_query, (person,))
+                conn.commit()
+
+    except Exception as error:
+        with open('error.text', 'a') as error_file:
+            error_file.write(F"Error inserting person: {error}\n")
+        print(f"Error inserting person: {error}")
+        conn.rollback()
+
+##HINWEIS: Funktioniert aktuell nur für leipzig
+def leipzi_personen_produkt(conn, item):
     try:   
-        cor = conn.cursor()
+        cur = conn.cursor()
         produkttyp = item['pgroup'] if item['pgroup'] is not "" else None
         if produkttyp == "DVD":
-            insert_query= "INSERT INTO dvd_personen (produkt_nr, person_id, rolle) VALUES (?, ?, ?)";
+            insert_query= "INSERT INTO dvd_personen (produkt_nr, person_id, rolle) VALUES (%s, %s, %s)";
+            produkt_nr = item.get('asin', 'unknown')
+            person_list = [tag for tag in item.find_all(name=["author", "artist", "actor", "director"]) if tag.has_attr('name')] or None
+            if person_list:    
+                for person in person_list:
+                    cur.execute("SELECT person_id FROM personen WHERE name=%s;", (person['name'].replace("'", "") ,))
+                    person_id = cur.fetchone()
+                    rolle = person.name
+                    rolle = rolle[:1].upper() + rolle[1:]
+                    print(produkt_nr, person_id,rolle)
+                    cur.execute(insert_query, (produkt_nr, person_id[0], rolle,))
+                    conn.commit()
         
 
         elif produkttyp == "Music":
-            insert_query= "INSERT INTO kuenstler_cds (produkt_nr, person_id) VALUES (?,?)";
+            insert_query= "INSERT INTO kuenstler_cds (produkt_nr, person_id) VALUES (%s,%s)";
+            produkt_nr = item.get('asin', 'unknown')
+            person_list = [tag for tag in item.find_all(name=["author", "artist", "actor", "director"]) if tag.has_attr('name')] or None
+            if person_list:    
+                for person in person_list:
+                    cur.execute("SELECT person_id FROM personen WHERE name=%s;", (person['name'].replace("'", "") ,))
+                    person_id = cur.fetchone()
+                    print(produkt_nr, person_id)
+                    cur.execute(insert_query, (produkt_nr, person_id[0],))
+                    conn.commit()
         
 
         elif produkttyp == "Book":
-            "INSERT INTO autoren_buecher (produkt_nr, person_id) VALUES (?,?)";
+            insert_query= "INSERT INTO autoren_buecher (produkt_nr, person_id) VALUES (%s,%s)";
+            produkt_nr = item.get('asin', 'unknown')
+            person_list = [tag for tag in item.find_all(name=["author", "artist", "actor", "director"]) if tag.has_attr('name')] or None
+            if person_list:    
+                for person in person_list:
+                    cur.execute("SELECT person_id FROM personen WHERE name=%s;", (person['name'].replace("'", "") ,))
+                    person_id = cur.fetchone()
+                    print(produkt_nr, person_id)
+                    cur.execute(insert_query, (produkt_nr, person_id[0],))
+                    conn.commit()
 
-        else None
+        else: None
     
     except Exception as error:
         with open('error.text', 'a') as error_file:
             error_file.write(f"Error inserting produkt_person: {error}\n")
         print(f"Error inserting person: {error}")
         conn.rollback()
+
+def dresdi_personen_produkt(conn, item):
+    try:   
+        cur = conn.cursor()
+        produkttyp = item['pgroup'] if item['pgroup'] is not "" else None
+        if produkttyp == "DVD":
+            insert_query= "INSERT INTO dvd_personen (produkt_nr, person_id, rolle) VALUES (%s,%s,%s)";
+            produkt_nr = item.get('asin', 'unknown')
+            person_list = [tag for tag in item.find_all(["author", "artist", "actor", "director"])] or None
+            cur = conn.cursor()
+            if person_list:    
+                for person in person_list:
+                    cur.execute("SELECT person_id FROM personen WHERE name=%s;", (person.text.replace("'", "") ,))
+                    person_id = cur.fetchone()
+                    rolle = person.name
+                    rolle = rolle[:1].upper() + rolle[1:]
+                    print(produkt_nr, person_id,rolle)
+                    cur.execute(insert_query, (produkt_nr, person_id[0], rolle,))
+                    conn.commit()
+        
+
+        elif produkttyp == "Music":
+            insert_query= "INSERT INTO kuenstler_cds (produkt_nr, person_id) VALUES (%s,%s)";
+            produkt_nr = item.get('asin', 'unknown')
+            person_list = [tag for tag in item.find_all(["author", "artist", "actor", "director"])] or None
+            cur = conn.cursor()
+            if person_list:    
+                for person in person_list:
+                    cur.execute("SELECT person_id FROM personen WHERE name=%s;", (person.text.replace("'", "") ,))
+                    person_id = cur.fetchone()
+                    print(produkt_nr, person_id)
+                    cur.execute(insert_query, (produkt_nr, person_id[0],))
+                    conn.commit()
+        
+
+        elif produkttyp == "Book":
+            insert_query= "INSERT INTO autoren_buecher (produkt_nr, person_id) VALUES (%s,%s)";
+            produkt_nr = item.get('asin', 'unknown')
+            person_list = [tag for tag in item.find_all(["author", "artist", "actor", "director"])] or None
+            cur = conn.cursor()
+            if person_list:    
+                for person in person_list:
+                    cur.execute("SELECT person_id FROM personen WHERE name=%s;", (person.text.replace("'", "") ,))
+                    person_id = cur.fetchone()
+                    print(produkt_nr, person_id)
+                    cur.execute(insert_query, (produkt_nr, person_id[0],))
+                    conn.commit()
+
+        else: None
+    
+    except Exception as error:
+        with open('error.text', 'a') as error_file:
+            error_file.write(f"Error inserting produkt_person: {error}\n")
+        print(f"Error inserting person: {error}")
+        conn.rollback()
+
