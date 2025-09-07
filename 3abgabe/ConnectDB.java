@@ -7,6 +7,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 
+
 public class ConnectDB {
 
     public Connection connect_to_db(String dbname,
@@ -28,9 +29,9 @@ public class ConnectDB {
     return conn;
     }
 
-    public void createTable(Session session, 
-        String tableName
+    public void createTable(String tableName
     ){
+        Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction transaction = null;
         try{
             transaction = session.beginTransaction();
@@ -66,22 +67,37 @@ public class ConnectDB {
 
     }
 
-    public void saveObject(
-        Session session
+    public void saveObject(String id,
+     String name,
+      float preis,
+       int rang,
+        String bildUrl,
+         String kategorie
     ){
-        
-        Produkte produkt = new Produkte("testid",
-        "testprodukt",
-        0.5f,
-        42,
-        "testbildurl",
-        "Book");
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction transaction = null;
+        try {
+            transaction = session.beginTransaction();
 
-        session.beginTransaction();
+            Produkte produkt = new Produkte(id,
+            name,
+            preis,
+            rang,
+            bildUrl,
+            kategorie);
 
-        session.persist(produkt);
+            session.persist(produkt);
 
-        session.getTransaction().commit();
+            transaction.commit();
+            System.out.println("Object saved...");
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
     
