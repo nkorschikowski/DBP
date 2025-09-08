@@ -12,7 +12,7 @@ public class Angebot{
     private int angebot_id; //TODO: serial
     private String produkt_nr;
     private int filiale_id;
-    private money preis; //TODO: money
+    //private money preis; //TODO: money
     private String zustand;
     //TODO: FK
 

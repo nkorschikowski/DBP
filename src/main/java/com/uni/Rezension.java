@@ -11,7 +11,7 @@ public class Rezension{
     //@GeneratedValue(strategy = GenerationType.IDENTITY) 
     private int person_id;
     private String produkt_nr;
-    private date date; //TODO: date
+    //private date date; //TODO: date
     private String summary;
     private int bewertung; //TODO: small int
     private String content;

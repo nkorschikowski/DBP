@@ -11,7 +11,7 @@ public class Buch{
     //@GeneratedValue(strategy = GenerationType.IDENTITY) 
     private String produkt_nr;
     private int seitenzahl;
-    private date erscheinungsdatum; //TODO: Datum
+    //private date erscheinungsdatum; //TODO: Datum
     private String isbn;
     private String verlag;
     //TODO: FK

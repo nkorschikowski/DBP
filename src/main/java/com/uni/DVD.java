@@ -11,7 +11,7 @@ public class DVD{
     //@GeneratedValue(strategy = GenerationType.IDENTITY) 
     private String produkt_nr;
     private String format;
-    private time laufzeit; //TODO: time
+    //private time laufzeit; //TODO: time
     private int region_code; //TODO: small int?
     //TODO: FK
 

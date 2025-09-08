@@ -11,7 +11,7 @@ public class MusikCD{
     //@GeneratedValue(strategy = GenerationType.IDENTITY) 
     private String produkt_nr;
     private String label;
-    private date erscheinungsdatum; //TODO: date
+    //private date erscheinungsdatum; //TODO: date
     //TODO: FK
 
 

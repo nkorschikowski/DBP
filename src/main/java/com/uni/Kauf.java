@@ -12,7 +12,7 @@ public class Kauf{
     private int kauf_id;
     private int filiale_id;
     private int person_id;
-    private date kaufdatum; //TODO: Date
+    //private date kaufdatum; //TODO: Date
     //TODO: FK
 
 

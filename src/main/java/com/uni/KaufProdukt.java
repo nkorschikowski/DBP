@@ -12,7 +12,7 @@ public class KaufProdukt{
     private int kauf_id;
     private int angebot_id;
     private int anzahl;
-    private money einzelpreis;
+    //private money einzelpreis;
     //TODO: FK
 
 
