@@ -1,0 +1,41 @@
+<!DOCTYPE hibernate-configuration PUBLIC
+    "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+    "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+        <!--postgresql dialect for dbms-->
+        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+
+        <!--properties for db connection-->
+        <!-- die 4 müssen über Porperty Datei laufen und wird in HibernateUtil.java überschrieben -->
+        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5435/merlin</property>
+        <property name="hibernate.connection.username">postgres</property>
+        <property name="hibernate.connection.password"></property>
+        
+        <property name="hibernate.hbm2ddl.auto">update</property>
+        <property name="hibernate.show_sql">true</property>
+        <!--Mapping class with annotated entries-->
+        <mapping class="com.uni.Adresse"/>
+        <mapping class="com.uni.AehnlicheProdukte"/>
+        <mapping class="com.uni.Angebot"/>
+        <mapping class="com.uni.AutorBuch"/>
+        <mapping class="com.uni.Buch"/>
+        <mapping class="com.uni.DVD"/>
+        <mapping class="com.uni.DVDPerson"/>
+        <mapping class="com.uni.Filiale"/>
+        <mapping class="com.uni.Kategorie"/>
+        <mapping class="com.uni.Kauf"/>
+        <mapping class="com.uni.KaufProdukt"/>
+        <mapping class="com.uni.KuenstlerCD"/>
+        <mapping class="com.uni.Kunde"/>
+        <mapping class="com.uni.MusikCD"/>
+        <mapping class="com.uni.Person"/>
+        <mapping class="com.uni.Produkt"/>
+        <mapping class="com.uni.ProduktKategorie"/>
+        <mapping class="com.uni.Rezension"/>
+        <mapping class="com.uni.Titel"/>
+        
+    </session-factory>
+</hibernate-configuration>
