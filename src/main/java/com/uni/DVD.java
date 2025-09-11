@@ -10,48 +10,43 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "buecher")
-public class Buch{
+@Table(name = "dvds")
+public class DVD{
+    
     @Id
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "produkt_nr", referencedColumnName = "produkt_nr", nullable = true)
     private Produkt produkt;
-    private int seitenzahl;
-    //private date erscheinungsdatum; //TODO: Datum
-    private String isbn;
-    private String verlag;
+    private String format;
+    //private time laufzeit; //TODO: time
+    private int region_code; //TODO: small int?
 
-
-    private Produkt get_produkt(){
+    private Produkt get_produkt() {
         return produkt;
     }
-    private void set_produkt(Produkt produkt){
+    private void set_produkt_nr(Produkt produkt) {
         this.produkt = produkt;
     }
-    private int get_seitenzahl(){
-        return seitenzahl;
+    private String get_format() {
+        return format;
     }
-    private void set_seitenzahl(int seitenzahl){
-        this.seitenzahl = seitenzahl;
+    private void set_format(String format) {
+        this.format = format;
     }
-    private String get_isbn(){
-        return isbn;
+    private int get_region_code() {
+        return region_code;
     }
-    private void set_isbn(String isbn){
-        this.isbn = isbn;
-    }
-    private String get_verlag(){
-        return verlag;
-    }
-    private void set_verlag(String verlag){
-        this.verlag = verlag;
+    private void set_region_code(int region_code) {
+        this.region_code = region_code;
     }
 
-    public Buch(Produkt produkt, int seitenzahl, String isbn, String verlag){
+    public DVD(Produkt produkt,
+    String format,
+    int region_code) {
         this.produkt = produkt;
-        this.seitenzahl = seitenzahl;
-        this.isbn = isbn;
-        this.verlag = verlag;   
+        this.format = format;
+        this.region_code = region_code;
     }
+
 }
