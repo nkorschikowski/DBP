@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -10,8 +10,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "produkt_kategorie")
-public class ProduktKategorie {
+@Table(name = "kuenstler_cds")
+public class KuenstlerCD {
 
     @Id // TODO: composite key (should use @EmbeddedId or @IdClass for real composite key)
     @ManyToOne
@@ -22,14 +22,14 @@ public class ProduktKategorie {
     @Id // TODO: composite key (should use @EmbeddedId or @IdClass for real composite key)
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "kategorie_id", referencedColumnName = "kategorie_id", nullable = false)
-    private Kategorie kategorie;
+    @JoinColumn(name = "person_id", referencedColumnName = "person_id", nullable = false)
+    private Person person;
 
-    public ProduktKategorie() {}
+    public KuenstlerCD() {}
 
-    public ProduktKategorie(Produkt produkt, Kategorie kategorie) {
+    public KuenstlerCD(Produkt produkt, Person person) {
         this.produkt = produkt;
-        this.kategorie = kategorie;
+        this.person = person;
     }
 
     public Produkt getProdukt() {
@@ -40,11 +40,11 @@ public class ProduktKategorie {
         this.produkt = produkt;
     }
 
-    public Kategorie getKategorie() {
-        return kategorie;
+    public Person getPerson() {
+        return person;
     }
 
-    public void setKategorie(Kategorie kategorie) {
-        this.kategorie = kategorie;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 }

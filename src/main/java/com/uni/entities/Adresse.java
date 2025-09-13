@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

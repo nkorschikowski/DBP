@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -12,37 +12,40 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "filialen")
-public class Filiale {
+@Table(name = "kunden")
+public class Kunde {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private int filiale_id; 
-    private String name;
+    private int id;
+
+    @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    @JoinColumn(name = "person_id", referencedColumnName = "person_id", nullable = true)
+    private Person person;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "adress_id", referencedColumnName = "adress_id", nullable = true)
     private Adresse adresse;
 
-    // Getter and Setter for filiale_id
-    public int getFiliale_id() {
-        return filiale_id;
+    private int kontonummer;
+
+    public Kunde() {}
+
+    public Kunde(Person person, Adresse adresse, int kontonummer) {
+        this.person = person;
+        this.adresse = adresse;
+        this.kontonummer = kontonummer;
     }
 
-    public void setFiliale_id(int filiale_id) {
-        this.filiale_id = filiale_id;
+    public Person getPerson() {
+        return person;
     }
 
-    // Getter and Setter for name
-    public String getName() {
-        return name;
+    public void setPerson(Person person) {
+        this.person = person;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    // Getter and Setter for adresse
     public Adresse getAdresse() {
         return adresse;
     }
@@ -51,14 +54,11 @@ public class Filiale {
         this.adresse = adresse;
     }
 
-    // Constructor
-    public Filiale(int filiale_id, String name, Adresse adresse) {
-        this.filiale_id = filiale_id;
-        this.name = name;
-        this.adresse = adresse;
+    public int getKontonummer() {
+        return kontonummer;
     }
 
-    // Default constructor (required by JPA)
-    public Filiale() {
+    public void setKontonummer(int kontonummer) {
+        this.kontonummer = kontonummer;
     }
 }

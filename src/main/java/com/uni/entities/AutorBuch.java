@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -10,27 +10,20 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "kuenstler_cds")
-public class KuenstlerCD {
-
-    @Id // TODO: composite key (should use @EmbeddedId or @IdClass for real composite key)
+@Table(name = "autoren_buecher")
+public class AutorBuch{
+    //To-DO: composite key
+    @Id
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "produkt_nr", referencedColumnName = "produkt_nr", nullable = false)
+    @JoinColumn(name = "produkt_nr", referencedColumnName = "produkt_nr", nullable = true)
     private Produkt produkt;
-
-    @Id // TODO: composite key (should use @EmbeddedId or @IdClass for real composite key)
+    @Id
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "person_id", referencedColumnName = "person_id", nullable = false)
+    @JoinColumn(name = "person_id", referencedColumnName = "person_id", nullable = true)
     private Person person;
-
-    public KuenstlerCD() {}
-
-    public KuenstlerCD(Produkt produkt, Person person) {
-        this.produkt = produkt;
-        this.person = person;
-    }
+    
 
     public Produkt getProdukt() {
         return produkt;
@@ -45,6 +38,15 @@ public class KuenstlerCD {
     }
 
     public void setPerson(Person person) {
+        this.person = person;
+    }
+
+    public AutorBuch() {
+        // Default constructor for JPA
+    }
+
+    public AutorBuch(Produkt produkt, Person person) {
+        this.produkt = produkt;
         this.person = person;
     }
 }

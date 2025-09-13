@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
@@ -10,20 +10,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "autoren_buecher")
-public class AutorBuch{
-    //To-DO: composite key
+@Table(name = "musikcds")
+public class MusikCD {
     @Id
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "produkt_nr", referencedColumnName = "produkt_nr", nullable = true)
     private Produkt produkt;
-    @Id
-    @ManyToOne
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JoinColumn(name = "person_id", referencedColumnName = "person_id", nullable = true)
-    private Person person;
-    
+    private String label;
+    //private date erscheinungsdatum; //TODO: date
 
     public Produkt getProdukt() {
         return produkt;
@@ -33,20 +28,22 @@ public class AutorBuch{
         this.produkt = produkt;
     }
 
-    public Person getPerson() {
-        return person;
+    public String getLabel() {
+        return label;
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public void setLabel(String label) {
+        this.label = label;
     }
+    //private date erscheinungsdatum(){return erscheinungsdatum;} //TODO: date
+    //private void setErscheinungsdatum(date erscheinungsdatum){this.erscheinungsdatum = erscheinungsdatum;} //TODO: date
 
-    public AutorBuch() {
-        // Default constructor for JPA
-    }
-
-    public AutorBuch(Produkt produkt, Person person) {
+    public MusikCD(Produkt produkt, String label) {
         this.produkt = produkt;
-        this.person = person;
+        this.label = label;
+    }
+
+    public MusikCD() {
+        // Default constructor for JPA
     }
 }
