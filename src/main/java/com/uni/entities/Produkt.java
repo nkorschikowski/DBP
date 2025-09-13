@@ -1,8 +1,8 @@
 package com.uni.entities;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "Produkte")
@@ -53,7 +53,7 @@ public class Produkt {
     }
 
     public Produkt(){};
-    
+
     public Produkt(String produkt_nr, 
     String titel,
     double rating,

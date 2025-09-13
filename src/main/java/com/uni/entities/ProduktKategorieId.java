@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 public class ProduktKategorieId {
     private String produkt_nr;

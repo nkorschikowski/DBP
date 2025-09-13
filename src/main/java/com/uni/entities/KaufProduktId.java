@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 public class KaufProduktId {
     private int kauf;

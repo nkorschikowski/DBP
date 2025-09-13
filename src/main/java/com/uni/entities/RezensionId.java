@@ -1,4 +1,4 @@
-package com.uni;
+package com.uni.entities;
 
 public class RezensionId {
     private String produkt_nr;
