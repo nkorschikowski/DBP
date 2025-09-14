@@ -80,31 +80,43 @@ public class Methods implements Interface{
         return result;
     };
 
-    // public Kategorie getCategoryTree(){
+    public Kategorie getCategoryTree(){
+        
+        Kategorie root = new Kategorie();
+        return root;
+    }; //TODO: soll ein Tree werden // Parameter = Wurzelknoten?
 
-    // }; //TODO: soll ein Tree werden // Parameter = Wurzelknoten?
+    public List<Produkt> getProductsByCategoryPath(String categoryPath){
 
-    // public List<Produkt> getProductsByCategoryPath(String categoryPath){
+        List<Produkt> result = new ArrayList<>();
+        return result;
+    };
 
-    // };
+    public List<Produkt> getTopProducts(int k){
 
-    // public List<Produkt> getTopProducts(int k){
+        List<Produkt> result = new ArrayList<>();
+        return result;
+    };
 
-    // };
+    public List<Produkt> getSimilarCheaperProduct(String produkt_nr){
 
-    // public List<Produkt> getSimilarCheaperProduct(String produkt_nr){
+        List<Produkt> result = new ArrayList<>();
+        return result;
+    };
 
-    // };
+    public void addNewReview(Rezension review){
 
-    // public void addNewReview(Rezension review){
+    };
 
-    // };
+    public List<Person> getTrolls(double minRating){
 
-    // public List<Person> getTrolls(double minRating){
+        List<Person> result = new ArrayList<>();
+        return result;
+    };
 
-    // };
-
-    // public List<Angebot> getOffers(String produkt_nr){
-
-    // };
+    public List<Angebot> getOffers(String produkt_nr){
+        
+        List<Angebot> result = new ArrayList<>();
+        return result;
+    };
 }

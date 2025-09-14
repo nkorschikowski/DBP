@@ -32,6 +32,27 @@ public class App
                     String pattern = sc.nextLine();
                     meth.getProducts(pattern);
                     break;
+                case "getCategoryTree":
+                    System.out.println("TODO"); // TODO
+                    break;
+                case "getProdutcsByCategoryPath": // TODO
+                    System.out.println("TODO");
+                    break;
+                case "getTopProducts": // TODO
+                    System.out.println("TODO");
+                    break;
+                case "getSimilarCheaperProduct": // TODO
+                    System.out.println("TODO");
+                    break;
+                case "addNewReview": // TODO
+                    System.out.println("TODO");
+                    break;
+                case "getTrolls": // TODO
+                    System.out.println("TODO");
+                    break;
+                case "getOffers": // TODO
+                    System.out.println("TODO");
+                    break;
                 case "end":
                     System.out.println("Anwendung wird beendet!");
                     state = false;

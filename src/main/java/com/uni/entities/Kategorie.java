@@ -35,6 +35,8 @@ public class Kategorie{
     public void set_oberkategorie_id(Kategorie oberkategorie_id) {
         this.oberkategorie = oberkategorie_id;
     }
+    public Kategorie (){};
+    
     public Kategorie(int kategorie_id,
      Kategorie oberkategorie
       ){
