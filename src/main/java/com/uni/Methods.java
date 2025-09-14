@@ -1,7 +1,10 @@
 package com.uni;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale.Category;
+import com.uni.TableFormatter;
+import com.uni.Tablefier;
 
 import com.uni.entities.*;
 
@@ -53,9 +56,30 @@ public class Methods implements Interface{
         return result; //TODO: was soll man mit return machen?
     };
 
-    // public List<Produkt> getProducts(String pattern){
+    public List<Produkt> getProducts(String pattern){
+        Session session = sessionFactory.openSession();
+        String hql = "from Produkt where titel LIKE :pattern";
+        Query<Produkt> q = session.createQuery(hql);
+        q.setParameter("pattern",pattern); // lt. Aufgabenstellung kann pattern Wildcards enthalten, also nicht Sache der Query
+        
+        List<Produkt> result = q.getResultList();
 
-    // };
+        List<String> headers = new ArrayList<>();
+        headers.add("produkt_nr");
+        headers.add("titel");
+        headers.add("rating");
+        headers.add("verkaufsrank");
+        headers.add("bild");
+        headers.add("produkttyp");
+
+        try {
+            Tablefier.printTable(result, headers);
+        } catch (Exception e) {
+            System.out.println("Sheeeeeeeeeeeeeeeeeeeeeeeeeeeeeesh  da lief was schieeeeeeeeeeeeeeeeeeeeeef");
+        }
+
+        return result;
+    };
 
     // public Kategorie getCategoryTree(){
 

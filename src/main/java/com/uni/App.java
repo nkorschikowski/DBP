@@ -24,8 +24,14 @@ public class App
                 case "finish":
                     meth.finish();
                     break;
-                case "getProdukt":
-                    meth.getProduct("B0000668PG");
+                case "getProduct":
+                    meth.getProduct("B0000668PG"); //TODO: dynamic machen
+                    break;
+                case "getProducts":
+                    System.out.println("Gib das Pattern an");
+                    String pattern = sc.nextLine();
+                    meth.getProducts(pattern);
+                    break;
                 case "end":
                     System.out.println("Anwendung wird beendet!");
                     state = false;

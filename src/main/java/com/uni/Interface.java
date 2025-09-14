@@ -11,7 +11,7 @@ public interface Interface {
 
     Produkt getProduct(String produkt_nr);
 
-    // List<Produkt> getProducts(String pattern);
+    List<Produkt> getProducts(String pattern);
 
     // Kategorie getCategoryTree(); //TODO: soll ein Tree werden // Parameter = Wurzelknoten?
 
