@@ -9,7 +9,7 @@ public class App
     public static void main( String[] args )
     {
         boolean state = true;
-        Methods meth = new Methods();
+        Interface meth = new Methods();
         Scanner sc = new Scanner(System.in);
         
         System.out.println( "Die Anwendung ist bereit!" );

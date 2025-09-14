@@ -9,7 +9,7 @@ public interface Interface {
 
     void finish();
 
-    // Produkt getProduct(String produkt_nr);
+    Produkt getProduct(String produkt_nr);
 
     // List<Produkt> getProducts(String pattern);
 
