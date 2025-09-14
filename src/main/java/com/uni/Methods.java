@@ -40,8 +40,17 @@ public class Methods implements Interface{
         q.setParameter("produkt_nr", produkt_nr);
 
         Produkt result = q.uniqueResult();
-        System.out.println("Du hast das Produkt " + result.get_produkt_nr() + " gefunden!");
-        return result; //was soll man mit return machen?
+        System.out.println(
+            "produkt_nr\ttitel\trating\tverkaufsrank\tbild\tprodukttyp \n" +
+            result.get_produkt_nr() + "\t"+ 
+            result.get_titel() + "\t" + 
+            result.get_rating() + "\t" +
+            result.get_verkaufsrang() + "\t" +
+            result.get_bild() + "\t" +
+            result.get_produkttyp()
+            );
+
+        return result; //TODO: was soll man mit return machen?
     };
 
     // public List<Produkt> getProducts(String pattern){

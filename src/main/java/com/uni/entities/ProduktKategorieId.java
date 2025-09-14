@@ -11,19 +11,19 @@ public class ProduktKategorieId {
         this.kategorie = kategorie;
     }
 
-    private String getProdukt_nr() {
+    public String getProdukt_nr() {
         return produkt_nr;
     }
 
-    private void setProdukt_nr(String produkt_nr) {
+    public void setProdukt_nr(String produkt_nr) {
         this.produkt_nr = produkt_nr;
     }
 
-    private String getKategorie() {
+    public String getKategorie() {
         return kategorie;
     }
 
-    private void setKategorie(String kategorie) {
+    public void setKategorie(String kategorie) {
         this.kategorie = kategorie;
     }
 

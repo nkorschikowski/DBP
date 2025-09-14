@@ -35,22 +35,22 @@ public class Angebot {
     private String zustand;
 
 
-    private int get_angebot_id() {
+    public int get_angebot_id() {
         return angebot_id;
     } 
-    private void set_angebot_id(int angebot_id) {
+    public void set_angebot_id(int angebot_id) {
         this.angebot_id = angebot_id;
     } 
-    private Produkt get_produkt() {
+    public Produkt get_produkt() {
         return produkt;
     }
-    private void set_produkt(Produkt produkt_nr) {
+    public void set_produkt(Produkt produkt_nr) {
         this.produkt = produkt;
     }
-    private Filiale get_filiale() {
+    public Filiale get_filiale() {
         return filiale;
     }
-    private void set_filiale(Filiale filiale) {
+    public void set_filiale(Filiale filiale) {
         this.filiale = filiale;
     }
 

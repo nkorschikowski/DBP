@@ -18,37 +18,37 @@ public class Produkt {
     public String get_produkt_nr(){
         return produkt_nr;
     }
-    private void set_produkt_nr(String produkt_nr){
+    public void set_produkt_nr(String produkt_nr){
         this.produkt_nr = produkt_nr;
     }
-    private String get_titel(){
+    public String get_titel(){
         return titel;
     }
-    private void set_titel(String titel){
+    public void set_titel(String titel){
         this.titel = titel;
     }
-    private double get_rating(){
+    public double get_rating(){
         return rating;
     }
-    private void set_rating(double rating){
+    public void set_rating(double rating){
         this.rating = rating;
     }
-    private int get_verkaufsrang(){
+    public int get_verkaufsrang(){
         return verkaufsrang;
     }
-    private void set_verkaufsrang(int verkaufsrang){
+    public void set_verkaufsrang(int verkaufsrang){
         this.verkaufsrang = verkaufsrang;
     }
-    private String get_bild(){
+    public String get_bild(){
         return bild;
     }
-    private void set_bild(String bild){
+    public void set_bild(String bild){
         this.bild = bild;
     }
-    private String get_produkttyp(){
+    public String get_produkttyp(){
         return produkttyp;
     }
-    private void set_produkttyp(String produkttyp){
+    public void set_produkttyp(String produkttyp){
         this.produkttyp = produkttyp;
     }
 

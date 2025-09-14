@@ -18,40 +18,40 @@ public class Adresse{
     private String plz;
     private String stadt;
 
-    private int get_adress_id(){
+    public int get_adress_id(){
         return adress_id;
     }
-    private void set_adress_id(int adress_id){
+    public void set_adress_id(int adress_id){
         this.adress_id = adress_id;
     }
-    private String get_straße(){
+    public String get_straße(){
         return straße;
     }
-    private void set_straße(String straße){
+    public void set_straße(String straße){
         this.straße = straße;
     }
-    private String get_hausnummer(){
+    public String get_hausnummer(){
         return hausnummer;
     }
-    private void set_hausnummer(String hausnummer){
+    public void set_hausnummer(String hausnummer){
         this.hausnummer = hausnummer;
     }
-    private String get_zusatz(){
+    public String get_zusatz(){
         return zusatz;
     }
-    private void set_zusatz(String zusatz){
+    public void set_zusatz(String zusatz){
         this.zusatz = zusatz;
     }
-    private String get_plz(){
+    public String get_plz(){
         return plz;
     }
-    private void set_plz(String plz){
+    public void set_plz(String plz){
         this.plz = plz;
     }
-    private String get_stadt(){
+    public String get_stadt(){
         return stadt;
     }
-    private void set_stadt(String stadt){
+    public void set_stadt(String stadt){
         this.stadt = stadt;
     }
 

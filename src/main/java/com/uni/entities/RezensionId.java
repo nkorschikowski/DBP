@@ -11,19 +11,19 @@ public class RezensionId {
         this.kunde_id = kunde_id;
     }
 
-    private String getProdukt_nr() {
+    public String getProdukt_nr() {
         return produkt_nr;
     }
 
-    private void setProdukt_nr(String produkt_nr) {
+    public void setProdukt_nr(String produkt_nr) {
         this.produkt_nr = produkt_nr;
     }
 
-    private int getKunde_id() {
+    public int getKunde_id() {
         return kunde_id;
     }
 
-    private void setKunde_id(int kunde_id) {
+    public void setKunde_id(int kunde_id) {
         this.kunde_id = kunde_id;
     }
 

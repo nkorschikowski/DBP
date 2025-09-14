@@ -22,22 +22,22 @@ public class DVD{
     //private time laufzeit; //TODO: time
     private int region_code; //TODO: small int?
 
-    private Produkt get_produkt() {
+    public Produkt get_produkt() {
         return produkt;
     }
-    private void set_produkt_nr(Produkt produkt) {
+    public void set_produkt_nr(Produkt produkt) {
         this.produkt = produkt;
     }
-    private String get_format() {
+    public String get_format() {
         return format;
     }
-    private void set_format(String format) {
+    public void set_format(String format) {
         this.format = format;
     }
-    private int get_region_code() {
+    public int get_region_code() {
         return region_code;
     }
-    private void set_region_code(int region_code) {
+    public void set_region_code(int region_code) {
         this.region_code = region_code;
     }
 

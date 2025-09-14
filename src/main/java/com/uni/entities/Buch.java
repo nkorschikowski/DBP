@@ -23,28 +23,28 @@ public class Buch{
     private String verlag;
 
 
-    private Produkt get_produkt(){
+    public Produkt get_produkt(){
         return produkt;
     }
-    private void set_produkt(Produkt produkt){
+    public void set_produkt(Produkt produkt){
         this.produkt = produkt;
     }
-    private int get_seitenzahl(){
+    public int get_seitenzahl(){
         return seitenzahl;
     }
-    private void set_seitenzahl(int seitenzahl){
+    public void set_seitenzahl(int seitenzahl){
         this.seitenzahl = seitenzahl;
     }
-    private String get_isbn(){
+    public String get_isbn(){
         return isbn;
     }
-    private void set_isbn(String isbn){
+    public void set_isbn(String isbn){
         this.isbn = isbn;
     }
-    private String get_verlag(){
+    public String get_verlag(){
         return verlag;
     }
-    private void set_verlag(String verlag){
+    public void set_verlag(String verlag){
         this.verlag = verlag;
     }
 

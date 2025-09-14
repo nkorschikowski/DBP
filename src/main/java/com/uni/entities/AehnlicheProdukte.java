@@ -20,16 +20,16 @@ public class AehnlicheProdukte {
     @Id
     private String produkt_nr2;
 
-    private Produkt get_produkt(){
+    public Produkt get_produkt(){
         return produkt;
     }
-    private void set_produkt(Produkt produkt_nr1){
+    public void set_produkt(Produkt produkt_nr1){
         this.produkt = produkt;
     }
-    private String get_produkt_nr2(){
+    public String get_produkt_nr2(){
         return produkt_nr2;
     }
-    private void set_produkt_nr2(String produkt_nr2){
+    public void set_produkt_nr2(String produkt_nr2){
         this.produkt_nr2 = produkt_nr2;
     }
 

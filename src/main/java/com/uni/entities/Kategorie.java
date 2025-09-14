@@ -23,19 +23,19 @@ public class Kategorie{
     private Kategorie oberkategorie; 
     //TODO: self refferential
 
-    private int get_kategorie_id() {
+    public int get_kategorie_id() {
         return kategorie_id;
     }
-    private void set_kategorie_id(int kategorie_id) {
+    public void set_kategorie_id(int kategorie_id) {
         this.kategorie_id = kategorie_id;
     }
-    private Kategorie get_oberkategorie() {
+    public Kategorie get_oberkategorie() {
         return oberkategorie;
     }
-    private void set_oberkategorie_id(Kategorie oberkategorie_id) {
+    public void set_oberkategorie_id(Kategorie oberkategorie_id) {
         this.oberkategorie = oberkategorie_id;
     }
-    private Kategorie(int kategorie_id,
+    public Kategorie(int kategorie_id,
      Kategorie oberkategorie
       ){
         this.kategorie_id = kategorie_id;

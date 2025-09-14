@@ -25,25 +25,25 @@ public class DVDPerson {
     private String rolle;
 
 
-    private Produkt get_produkt() {
+    public Produkt get_produkt() {
         return produkt;
     }
-    private void set_produkt(Produkt produkt) {
+    public void set_produkt(Produkt produkt) {
         this.produkt = produkt;
     }
-    private Person get_person() {
+    public Person get_person() {
         return person;
     }
-    private void set_person(Person person) {
+    public void set_person(Person person) {
         this.person = person;
     }
-    private String get_rolle() {
+    public String get_rolle() {
         return rolle;
     }
-    private void set_rolle(String rolle) {
+    public void set_rolle(String rolle) {
         this.rolle = rolle;
     }
-    private DVDPerson(Produkt produkt,
+    public DVDPerson(Produkt produkt,
                      Person person,
                      String rolle
     ) {
