@@ -3,7 +3,6 @@ package com.uni;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale.Category;
-import com.uni.TableFormatter;
 import com.uni.Tablefier;
 
 import com.uni.entities.*;
@@ -75,7 +74,7 @@ public class Methods implements Interface{
         try {
             Tablefier.printTable(result, headers);
         } catch (Exception e) {
-            System.out.println("Sheeeeeeeeeeeeeeeeeeeeeeeeeeeeeesh  da lief was schieeeeeeeeeeeeeeeeeeeeeef");
+            System.out.println("Tablefier will nicht mehr!");
         }
 
         return result;
