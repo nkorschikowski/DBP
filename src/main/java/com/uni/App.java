@@ -15,7 +15,7 @@ public class App
         System.out.println( "Die Anwendung ist bereit!" );
         System.out.println("Eingabe wird erwartet ...");
 
-        while(true){
+        while(state){
             String input = sc.nextLine();
             switch(input) {
                 case "init":
