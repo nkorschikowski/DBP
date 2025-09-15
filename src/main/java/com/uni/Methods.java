@@ -68,7 +68,7 @@ public class Methods implements Interface{
         headers.add("produkt_nr");
         headers.add("titel");
         headers.add("rating");
-        headers.add("verkaufsrank");
+        headers.add("verkaufsrang");
         headers.add("bild");
         headers.add("produkttyp");
 
@@ -95,8 +95,31 @@ public class Methods implements Interface{
     };
 
     public List<Produkt> getTopProducts(int k){
+        // gibt derzeit viel Produkte mit Verkaufsrang -1 zurück
+        // daher auch nicht nur 10 Ergebnise bei k = 10
+
+        Session session = sessionFactory.openSession();
+        String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1)";
+        Query<Produkt> q = session.createQuery(hql);
+        q.setParameter("k",k);
         
-        List<Produkt> result = new ArrayList<>();
+        List<Produkt> result = q.getResultList();
+
+        List<String> headers = new ArrayList<>();
+        headers.add("produkt_nr");
+        // headers.add("titel");
+        // headers.add("rating");
+        headers.add("verkaufsrang");
+        // headers.add("bild");
+        // headers.add("produkttyp");
+
+        try {
+            Tablefier.printTable(result, headers);
+        } catch (Exception e) {
+            System.out.println("Tablefier will nicht mehr!");
+        }
+        session.close();
+
         return result;
     };
 

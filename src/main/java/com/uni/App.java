@@ -38,8 +38,11 @@ public class App
                 case "getProdutcsByCategoryPath": // TODO
                     System.out.println("TODO");
                     break;
-                case "getTopProducts": // TODO
-                    System.out.println("TODO");
+                case "getTopProducts":
+                    System.out.println("Gib das Threshhold an");
+                    String kstring = sc.nextLine();
+                    int k = Integer.parseInt(kstring);
+                    meth.getTopProducts(k);
                     break;
                 case "getSimilarCheaperProduct": // TODO
                     System.out.println("TODO");
