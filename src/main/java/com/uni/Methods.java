@@ -52,6 +52,7 @@ public class Methods implements Interface{
             result.get_produkttyp()
             );
 
+        session.close();
         return result; //TODO: was soll man mit return machen?
     };
 
@@ -76,6 +77,7 @@ public class Methods implements Interface{
         } catch (Exception e) {
             System.out.println("Tablefier will nicht mehr!");
         }
+        session.close();
 
         return result;
     };
@@ -93,7 +95,7 @@ public class Methods implements Interface{
     };
 
     public List<Produkt> getTopProducts(int k){
-
+        
         List<Produkt> result = new ArrayList<>();
         return result;
     };
