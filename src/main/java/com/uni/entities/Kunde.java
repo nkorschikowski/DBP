@@ -21,44 +21,44 @@ public class Kunde {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "person_id", referencedColumnName = "person_id", nullable = true)
-    private Person person;
+    private Person person_id;
 
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "adress_id", referencedColumnName = "adress_id", nullable = true)
-    private Adresse adresse;
+    private Adresse adresse_id;
 
     private int kontonummer;
 
     public Kunde() {}
 
-    public Kunde(Person person, Adresse adresse, int kontonummer) {
-        this.person = person;
-        this.adresse = adresse;
+    public Kunde(Person person_id, Adresse adresse_id, int kontonummer) {
+        this.person_id = person_id;
+        this.adresse_id = adresse_id;
         this.kontonummer = kontonummer;
     }
 
-    public Person getPerson() {
-        return person;
+    public Person get_Person_id() {
+        return person_id;
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public void set_Person(Person person_id) {
+        this.person_id = person_id;
     }
 
-    public Adresse getAdresse() {
-        return adresse;
+    public Adresse get_Adresse_id() {
+        return adresse_id;
     }
 
-    public void setAdresse(Adresse adresse) {
-        this.adresse = adresse;
+    public void set_Adresse_id(Adresse adresse_id) {
+        this.adresse_id = adresse_id;
     }
 
-    public int getKontonummer() {
+    public int get_Kontonummer() {
         return kontonummer;
     }
 
-    public void setKontonummer(int kontonummer) {
+    public void set_Kontonummer(int kontonummer) {
         this.kontonummer = kontonummer;
     }
 }
