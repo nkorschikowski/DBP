@@ -22,39 +22,39 @@ public class Titel {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "produkt_nr", referencedColumnName = "produkt_nr", nullable = false)
-    private Produkt produkt;
+    private Produkt produkt_nr;
 
     public Titel() {
         // Default constructor for JPA
     }
 
-    public Titel(int titel_id, String name, Produkt produkt) {
+    public Titel(int titel_id, String name, Produkt produkt_nr) {
         this.titel_id = titel_id;
         this.name = name;
-        this.produkt = produkt;
+        this.produkt_nr = produkt_nr;
     }
 
-    public int getTitel_id() {
+    public int get_Titel_id() {
         return titel_id;
     }
 
-    public void setTitel_id(int titel_id) {
+    public void set_Titel_id(int titel_id) {
         this.titel_id = titel_id;
     }
 
-    public String getName() {
+    public String get_Name() {
         return name;
     }
 
-    public void setName(String name) {
+    public void set_Name(String name) {
         this.name = name;
     }
 
-    public Produkt getProdukt() {
-        return produkt;
+    public Produkt get_Produkt_nr() {
+        return produkt_nr;
     }
 
-    public void setProdukt(Produkt produkt) {
-        this.produkt = produkt;
+    public void set_Produkt_nr(Produkt produkt_nr) {
+        this.produkt_nr = produkt_nr;
     }
 }
