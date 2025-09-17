@@ -5,79 +5,96 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "rezensionen")
+@IdClass(RezensionId.class)
 public class Rezension {
 
-    @Id // TODO: composite key
+    @Id //composite key
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "person_id", referencedColumnName = "person_id", nullable = false)
-    private Person person;
+    private Person person_id;
 
-    @Id // TODO: composite key
+    @Id //composite key
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "produkt_nr", referencedColumnName = "produkt_nr", nullable = false)
-    private Produkt produkt;
+    private Produkt produkt_nr;
 
     // private date date; //TODO: date
     private String summary;
     private int bewertung; //TODO: small int
     private String content;
 
-    public Person getPerson() {
-        return person;
+    public Person get_Person_id() {
+        return person_id;
     }
 
-    public void setPerson(Person person) {
-        this.person = person;
+    public void set_Person_id(Person person_id) {
+        this.person_id = person_id;
     }
 
-    public Produkt getProdukt() {
-        return produkt;
+    public Produkt get_Produkt_nr() {
+        return produkt_nr;
     }
 
-    public void setProdukt(Produkt produkt) {
-        this.produkt = produkt;
+    public void set_Produkt_nr(Produkt produkt_nr) {
+        this.produkt_nr = produkt_nr;
     }
 
-    public String getSummary() {
+    public String get_Summary() {
         return summary;
     }
 
-    public void setSummary(String summary) {
+    public void set_Summary(String summary) {
         this.summary = summary;
     }
 
-    public int getBewertung() {
+    public int get_Bewertung() {
         return bewertung;
     }
 
-    public void setBewertung(int bewertung) {
+    public void set_Bewertung(int bewertung) {
         this.bewertung = bewertung;
     }
 
-    public String getContent() {
+    public String get_Content() {
         return content;
     }
 
-    public void setContent(String content) {
+    public void set_Content(String content) {
         this.content = content;
     }
 
     public Rezension() {
     }
 
-    public Rezension(Person person, Produkt produkt, String summary, int bewertung, String content) {
-        this.person = person;
-        this.produkt = produkt;
+    public Rezension(Person person_id, Produkt produkt_nr, String summary, int bewertung, String content) {
+        this.person_id = person_id;
+        this.produkt_nr = produkt_nr;
         this.summary = summary;
         this.bewertung = bewertung;
         this.content = content;
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Rezension)) return false;
+        Rezension that = (Rezension) o;
+        return person_id != null && produkt_nr != null &&
+               person_id.equals(that.person_id) &&
+               produkt_nr.equals(that.produkt_nr);
+    }
+    @Override
+    public int hashCode() {
+        int result = (person_id != null ? person_id.hashCode() : 0);
+        result = 31 * result + (produkt_nr != null ? produkt_nr.hashCode() : 0);
+        return result;
     }
 }
