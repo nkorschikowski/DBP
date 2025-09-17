@@ -5,21 +5,23 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.IdClass;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "produkt_kategorie")
+@IdClass(ProduktKategorieId.class)
 public class ProduktKategorie {
 
-    @Id // TODO: composite key (should use @EmbeddedId or @IdClass for real composite key)
+    @Id // composite key (should use @EmbeddedId or @IdClass for real composite key)
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "produkt_nr", referencedColumnName = "produkt_nr", nullable = false)
-    private Produkt produkt;
+    private Produkt produkt_nr;
 
-    @Id // TODO: composite key (should use @EmbeddedId or @IdClass for real composite key)
+    @Id // composite key (should use @EmbeddedId or @IdClass for real composite key)
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "kategorie_id", referencedColumnName = "kategorie_id", nullable = false)
@@ -27,24 +29,40 @@ public class ProduktKategorie {
 
     public ProduktKategorie() {}
 
-    public ProduktKategorie(Produkt produkt, Kategorie kategorie) {
-        this.produkt = produkt;
+    public ProduktKategorie(Produkt produkt_nr, Kategorie kategorie) {
+        this.produkt_nr = produkt_nr;
         this.kategorie = kategorie;
     }
 
-    public Produkt getProdukt() {
-        return produkt;
+    public Produkt get_Produkt_nr() {
+        return produkt_nr;
     }
 
-    public void setProdukt(Produkt produkt) {
-        this.produkt = produkt;
+    public void set_Produkt_nr(Produkt produkt_nr) {
+        this.produkt_nr = produkt_nr;
     }
 
-    public Kategorie getKategorie() {
+    public Kategorie get_Kategorie() {
         return kategorie;
     }
 
-    public void setKategorie(Kategorie kategorie) {
+    public void set_Kategorie_id(Kategorie kategorie) {
         this.kategorie = kategorie;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ProduktKategorie)) return false;
+        ProduktKategorie that = (ProduktKategorie) o;
+        return produkt_nr != null && produkt_nr.equals(that.produkt_nr) &&
+               kategorie != null && kategorie.equals(that.kategorie);
+    }
+    @Override
+    public int hashCode() {
+        int result = 17;
+        result = 31 * result + (produkt_nr != null ? produkt_nr.hashCode() :  0);
+        result = 31 * result + (kategorie != null ? kategorie.hashCode() : 0);
+        return result;  
+    }  
+    
 }
