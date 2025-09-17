@@ -17,20 +17,20 @@ public class Person {
 
 
     // Getter and Setter for person_id
-    public int getPerson_id() {
+    public int get_Person_id() {
         return person_id;
     }
 
-    public void setPerson_id(int person_id) {
+    public void set_Person_id(int person_id) {
         this.person_id = person_id;
     }
 
     // Getter and Setter for name
-    public String getName() {
+    public String get_Name() {
         return name;
     }
 
-    public void setName(String name) {
+    public void set_Name(String name) {
         this.name = name;
     }
 
