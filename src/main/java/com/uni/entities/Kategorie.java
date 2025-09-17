@@ -20,7 +20,7 @@ public class Kategorie{
     @ManyToOne 
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name="oberkategorie_id", referencedColumnName="kategorie_id")
-    private Kategorie oberkategorie; 
+    private Kategorie oberkategorie_id; 
     //TODO: self refferential
 
     public int get_kategorie_id() {
@@ -29,19 +29,19 @@ public class Kategorie{
     public void set_kategorie_id(int kategorie_id) {
         this.kategorie_id = kategorie_id;
     }
-    public Kategorie get_oberkategorie() {
-        return oberkategorie;
+    public Kategorie get_oberkategorie_id() {
+        return oberkategorie_id;
     }
     public void set_oberkategorie_id(Kategorie oberkategorie_id) {
-        this.oberkategorie = oberkategorie_id;
+        this.oberkategorie_id = oberkategorie_id;
     }
     public Kategorie (){};
     
     public Kategorie(int kategorie_id,
-     Kategorie oberkategorie
+     Kategorie oberkategorie_id
       ){
         this.kategorie_id = kategorie_id;
-        this.oberkategorie = oberkategorie;
+        this.oberkategorie_id = oberkategorie_id;
     }
 
 }
