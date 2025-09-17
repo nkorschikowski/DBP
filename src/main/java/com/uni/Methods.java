@@ -138,19 +138,19 @@ public class Methods implements Interface{
         Rezension rezension = new Rezension();
         System.out.println("Wie lautet der (genaue) Name der Person?");
         // input = sc.nextLine();
-        rezension.setPerson(getPersonByName("Va")); // TODO: dynamic
+        rezension.set_Person_id(getPersonByName("Va")); // TODO: dynamic
         System.out.println("Wie lautet die Produktnummer?");
         // input = sc.nextLine();
-        rezension.setProdukt(getProduct("B0000668PG")); // TODO: dynamic
+        rezension.set_Produkt_nr(getProduct("B0000668PG")); // TODO: dynamic
         System.out.println("Wie lautet die Kurzbeschreibung?");
         input = sc.nextLine();
-        rezension.setSummary(input);
+        rezension.set_Summary(input);
         System.out.println("Welche Wertung von 1 bis 5?");
         input = sc.nextLine();
-        rezension.setBewertung(Integer.parseInt(input));
+        rezension.set_Bewertung(Integer.parseInt(input));
         System.out.println("Inhalt der Rezension?");
         input = sc.nextLine();
-        rezension.setContent(input);
+        rezension.set_Content(input);
         sc.close();
     
         try {
@@ -170,16 +170,16 @@ public class Methods implements Interface{
 
     public List<Person> getTrolls(double maxRating){
         Session session = sessionFactory.openSession();
-        // "SELECT * FROM personen WHERE person_id IN (SELECT person_id FROM rezensionen GROUP BY person_id HAVING AVG(bewertung) <=3)
         String hql = """
         FROM Person p
-        WHERE p.person_id IN 
+        WHERE p IN 
             (SELECT r.person_id 
             FROM Rezension r
             GROUP BY r.person_id 
                 HAVING AVG(r.bewertung) <=  :maxRating)
         """;
-        Query<Person> q = session.createQuery(hql);
+
+        Query<Person> q = session.createQuery(hql,Person.class);
         q.setParameter("maxRating", maxRating);
 
         List<Person> result = q.getResultList();
