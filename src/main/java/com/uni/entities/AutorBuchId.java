@@ -14,19 +14,19 @@ public class AutorBuchId implements Serializable {
         this.produkt_nr = produkt_nr;
     }
 
-    public int getPerson_id() {
+    public int get_Person_id() {
         return person_id;
     }
 
-    public void setPerson_id(int person_id) {
+    public void set_Person_id(int person_id) {
         this.person_id = person_id;
     }
 
-    public String getProdukt_nr() {
+    public String get_Produkt_nr() {
         return produkt_nr;
     }
 
-    public void setProdukt_nr(String produkt_nr) {
+    public void set_Produkt_nr(String produkt_nr) {
         this.produkt_nr = produkt_nr;
     }
 
