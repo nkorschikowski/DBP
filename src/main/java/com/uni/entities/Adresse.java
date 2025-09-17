@@ -68,4 +68,5 @@ public class Adresse{
         this.plz = plz;
         this.stadt = stadt;
     }
+    public Adresse(){}
 }
