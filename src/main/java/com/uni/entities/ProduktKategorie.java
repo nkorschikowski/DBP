@@ -25,13 +25,13 @@ public class ProduktKategorie {
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @JoinColumn(name = "kategorie_id", referencedColumnName = "kategorie_id", nullable = false)
-    private Kategorie kategorie;
+    private Kategorie kategorie_id;
 
     public ProduktKategorie() {}
 
-    public ProduktKategorie(Produkt produkt_nr, Kategorie kategorie) {
+    public ProduktKategorie(Produkt produkt_nr, Kategorie kategorie_id) {
         this.produkt_nr = produkt_nr;
-        this.kategorie = kategorie;
+        this.kategorie_id = kategorie_id;
     }
 
     public Produkt get_Produkt_nr() {
@@ -42,12 +42,12 @@ public class ProduktKategorie {
         this.produkt_nr = produkt_nr;
     }
 
-    public Kategorie get_Kategorie() {
-        return kategorie;
+    public Kategorie get_Kategorie_id() {
+        return kategorie_id;
     }
 
-    public void set_Kategorie_id(Kategorie kategorie) {
-        this.kategorie = kategorie;
+    public void set_Kategorie_id(Kategorie kategorie_id) {
+        this.kategorie_id = kategorie_id;
     }
     @Override
     public boolean equals(Object o) {
@@ -55,13 +55,13 @@ public class ProduktKategorie {
         if (!(o instanceof ProduktKategorie)) return false;
         ProduktKategorie that = (ProduktKategorie) o;
         return produkt_nr != null && produkt_nr.equals(that.produkt_nr) &&
-               kategorie != null && kategorie.equals(that.kategorie);
+               kategorie_id != null && kategorie_id.equals(that.kategorie_id);
     }
     @Override
     public int hashCode() {
         int result = 17;
         result = 31 * result + (produkt_nr != null ? produkt_nr.hashCode() :  0);
-        result = 31 * result + (kategorie != null ? kategorie.hashCode() : 0);
+        result = 31 * result + (kategorie_id != null ? kategorie_id.hashCode() : 0);
         return result;  
     }  
     
