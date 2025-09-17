@@ -50,8 +50,10 @@ public class App
                 case "addNewReview":
                     meth.addNewReview();
                     break;
-                case "getTrolls": // TODO
-                    System.out.println("TODO");
+                case "getTrolls":
+                    System.out.println("Was soll die maximale Durchschnittsbewertung sein? z.B. 3.8 (inklusiv)");
+                    double max = Double.parseDouble(sc.nextLine());
+                    meth.getTrolls(max);
                     break;
                 case "getOffers": // TODO
                     System.out.println("TODO");

@@ -45,7 +45,7 @@ public interface Interface {
     // Die Rahmenapplikation erlaubt sowohl das Ansehen als auch Hinzufügen von Reviews. 
     // Mit Hilfe der Methode wird ein neues Review in der Datenbank gespeichert.
 
-    List<Person> getTrolls(double minRating);
+    List<Person> getTrolls(double maxRating);
     // Die Methode soll eine Liste von Nutzern ausgeben, deren Durchschnittsbewertung unter einem spezifizierten Rating ist.
 
     List<Angebot> getOffers(String produkt_nr);
