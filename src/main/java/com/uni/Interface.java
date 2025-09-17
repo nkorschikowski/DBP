@@ -41,9 +41,9 @@ public interface Interface {
     List<Produkt> getSimilarCheaperProduct(String produkt_nr);
     // Diese Methode liefert für ein Produkt(Id) eine List von Produkten, die ähnlich und billiger sind als das spezifizierte.
 
-    void addNewReview(Rezension review);
-    // ie Rahmenapplikation erlaubt sowohl das Ansehen als auch Hinzufügen von Reviews. 
-    // MIt Hilfe der Methode wird ein neues Review in der Datenbank gespeichert.
+    void addNewReview();
+    // Die Rahmenapplikation erlaubt sowohl das Ansehen als auch Hinzufügen von Reviews. 
+    // Mit Hilfe der Methode wird ein neues Review in der Datenbank gespeichert.
 
     List<Person> getTrolls(double minRating);
     // Die Methode soll eine Liste von Nutzern ausgeben, deren Durchschnittsbewertung unter einem spezifizierten Rating ist.

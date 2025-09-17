@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Locale.Category;
 import com.uni.Tablefier;
 
+import java.util.Scanner;
+
 import com.uni.entities.*;
 
 import com.uni.HibernateUtil;
@@ -12,6 +14,7 @@ import com.uni.HibernateUtil;
 import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.boot.MetadataSources;
 import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
@@ -95,11 +98,8 @@ public class Methods implements Interface{
     };
 
     public List<Produkt> getTopProducts(int k){
-        // gibt derzeit viel Produkte mit Verkaufsrang -1 zurück
-        // daher auch nicht nur 10 Ergebnise bei k = 10
-
         Session session = sessionFactory.openSession();
-        String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1)";
+        String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1)"; // TODO: ist das sauber? ^^
         Query<Produkt> q = session.createQuery(hql);
         q.setParameter("k",k);
         
@@ -129,8 +129,43 @@ public class Methods implements Interface{
         return result;
     };
 
-    public void addNewReview(Rezension review){
+    public void addNewReview(){
+        Session session = sessionFactory.openSession();
+        Transaction transaction = null;
 
+        Scanner sc = new Scanner(System.in);
+        String input;
+        Rezension rezension = new Rezension();
+        System.out.println("Wie lautet der (genaue) Name der Person?");
+        // input = sc.nextLine();
+        rezension.setPerson(getPersonByName("Va")); // TODO: dynamic
+        System.out.println("Wie lautet die Produktnummer?");
+        // input = sc.nextLine();
+        rezension.setProdukt(getProduct("B0000668PG")); // TODO: dynamic
+        System.out.println("Wie lautet die Kurzbeschreibung?");
+        input = sc.nextLine();
+        rezension.setSummary(input);
+        System.out.println("Welche Wertung von 1 bis 5?");
+        input = sc.nextLine();
+        rezension.setBewertung(Integer.parseInt(input));
+        System.out.println("Inhalt der Rezension?");
+        input = sc.nextLine();
+        rezension.setContent(input);
+        sc.close();
+    
+        try {
+            transaction = session.beginTransaction();
+            session.persist(rezension);
+            transaction.commit();
+            System.out.println("Objekt wurde gespeichert");
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     };
 
     public List<Person> getTrolls(double minRating){
@@ -144,4 +179,16 @@ public class Methods implements Interface{
         List<Angebot> result = new ArrayList<>();
         return result;
     };
+
+
+    // Helper functions
+    public Person getPersonByName(String name){
+        Session session = sessionFactory.openSession();
+        String hql = "FROM Person WHERE name = :name";         
+        Query<Person> q = session.createQuery(hql);
+        q.setParameter("name",name);
+        Person person = q.uniqueResult();
+
+        return person;
+    }
 }

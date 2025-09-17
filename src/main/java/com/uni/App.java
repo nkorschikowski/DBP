@@ -47,8 +47,8 @@ public class App
                 case "getSimilarCheaperProduct": // TODO
                     System.out.println("TODO");
                     break;
-                case "addNewReview": // TODO
-                    System.out.println("TODO");
+                case "addNewReview":
+                    meth.addNewReview();
                     break;
                 case "getTrolls": // TODO
                     System.out.println("TODO");
