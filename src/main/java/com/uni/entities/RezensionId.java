@@ -2,29 +2,29 @@ package com.uni.entities;
 
 public class RezensionId {
     private String produkt_nr;
-    private int kunde_id;
+    private int person_id;
 
     public RezensionId() {}
 
-    public RezensionId(String produkt_nr, int kunde_id) {
+    public RezensionId(String produkt_nr, int person_id) {
         this.produkt_nr = produkt_nr;
-        this.kunde_id = kunde_id;
+        this.person_id = person_id;
     }
 
-    public String getProdukt_nr() {
+    public String get_Produkt_nr() {
         return produkt_nr;
     }
 
-    public void setProdukt_nr(String produkt_nr) {
+    public void set_Produkt_nr(String produkt_nr) {
         this.produkt_nr = produkt_nr;
     }
 
-    public int getKunde_id() {
-        return kunde_id;
+    public int get_person_id() {
+        return person_id;
     }
 
-    public void setKunde_id(int kunde_id) {
-        this.kunde_id = kunde_id;
+    public void set_person_id(int person_id) {
+        this.person_id = person_id;
     }
 
     @Override
@@ -32,11 +32,11 @@ public class RezensionId {
         if (this == o) return true;
         if (!(o instanceof RezensionId)) return false;
         RezensionId that = (RezensionId) o;
-        return kunde_id == that.kunde_id && produkt_nr.equals(that.produkt_nr);
+        return person_id == that.person_id && produkt_nr.equals(that.produkt_nr);
     }
 
     @Override
     public int hashCode() {
-        return java.util.Objects.hash(produkt_nr, kunde_id);
+        return java.util.Objects.hash(produkt_nr, person_id);
     }
 }
