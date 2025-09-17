@@ -25,29 +25,29 @@ public class Filiale {
     private Adresse adresse;
 
     // Getter and Setter for filiale_id
-    public int getFiliale_id() {
+    public int get_Filiale_id() {
         return filiale_id;
     }
 
-    public void setFiliale_id(int filiale_id) {
+    public void set_Filiale_id(int filiale_id) {
         this.filiale_id = filiale_id;
     }
 
     // Getter and Setter for name
-    public String getName() {
+    public String get_Name() {
         return name;
     }
 
-    public void setName(String name) {
+    public void set_Name(String name) {
         this.name = name;
     }
 
     // Getter and Setter for adresse
-    public Adresse getAdresse() {
+    public Adresse get_Adresse() {
         return adresse;
     }
 
-    public void setAdresse(Adresse adresse) {
+    public void set_Adresse(Adresse adresse) {
         this.adresse = adresse;
     }
 
