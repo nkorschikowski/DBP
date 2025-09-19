@@ -53,6 +53,18 @@ public class Angebot {
     public void set_filiale_id(Filiale filiale_id) {
         this.filiale_id = filiale_id;
     }
+    public BigDecimal get_preis(){
+        return preis;
+    }
+    public void set_preis(BigDecimal preis){
+        this.preis = preis;
+    }
+    public String get_zustand(){
+        return zustand;
+    }
+    public void set_zustand(String zustand){
+        this.zustand = zustand;
+    }
 
     public Angebot(int angebot_id, 
     Produkt produkt_nr, 

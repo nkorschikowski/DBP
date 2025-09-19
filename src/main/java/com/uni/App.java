@@ -55,8 +55,10 @@ public class App
                     double max = Double.parseDouble(sc.nextLine());
                     meth.getTrolls(max);
                     break;
-                case "getOffers": // TODO
-                    System.out.println("TODO");
+                case "getOffers":
+                    System.out.println("Wie lautet die Produktnummer?");
+                    // String produkt_nr = sc.nextLine();
+                    meth.getOffers("B000005GWE");
                     break;
                 case "end":
                     System.out.println("Anwendung wird beendet!");

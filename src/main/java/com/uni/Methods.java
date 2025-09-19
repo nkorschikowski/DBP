@@ -199,8 +199,28 @@ public class Methods implements Interface{
     };
 
     public List<Angebot> getOffers(String produkt_nr){
-        
-        List<Angebot> result = new ArrayList<>();
+         Session session = sessionFactory.openSession();
+        String hql = "FROM Angebot WHERE produkt_nr.produkt_nr = :produkt_nr";
+
+        Query<Angebot> q = session.createQuery(hql,Angebot.class);
+        q.setParameter("produkt_nr", produkt_nr);
+
+        List<Angebot> result = q.getResultList();
+
+        List<String> headers = new ArrayList<>();
+        headers.add("angebot_id");
+        headers.add("produkt_nr");
+        headers.add("filiale_id");
+        headers.add("preis");
+        headers.add("zustand");
+
+        try {
+            Tablefier.printTable(result, headers);
+        } catch (Exception e) {
+            System.out.println("Tablefier will nicht mehr!");
+        }
+        session.close();
+
         return result;
     };
 

@@ -25,11 +25,11 @@ public class Filiale {
     private Adresse adresse;
 
     // Getter and Setter for filiale_id
-    public int get_Filiale_id() {
+    public int get_filiale_id() {
         return filiale_id;
     }
 
-    public void set_Filiale_id(int filiale_id) {
+    public void set_filiale_id(int filiale_id) {
         this.filiale_id = filiale_id;
     }
 

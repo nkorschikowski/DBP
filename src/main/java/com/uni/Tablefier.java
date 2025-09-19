@@ -32,7 +32,36 @@ public class Tablefier {
                 try {
                     Method getter = clazz.getMethod(getterName);
                     Object value = getter.invoke(obj);
-                    row[i] = (value == null) ? "null" : value.toString();
+                    System.out.println("Started: " + getterName);
+                    if(value instanceof Number 
+                    || value instanceof String 
+                    || value instanceof Boolean 
+                    || value instanceof Character 
+                    || value instanceof java.util.Date
+                    || value.getClass().isPrimitive()){
+                        System.out.println("standard case: " + value.getClass());
+                        System.out.println("getter: " + getter);
+                        row[i] = (value == null) ? "null" : value.toString();
+                    } else {
+                        // System.out.println("class case: "+ value.getClass());
+                        // clazz = value.getClass();
+                        // System.out.println("Clazz: " + clazz);
+                        // getter = clazz.getMethod(getterName);
+                        // System.out.println("getter: " + getter);
+                        // value = getter.invoke(value); // bischen wirr die Line ... :
+                        // System.out.print("Ergebnis: " + value);
+                        // // Value soll eine Primitive Variable (z.Bsp: int oder Integer)sei. 
+                        // // Ist man in dieser Line gelandet WAR value aber ein Entity object welches hier als Parameter gegeben wird um eben 
+                        // // daruas die tatsächliche Variable zu bekommen
+                        Object realvalue = digdeeper(value,field);
+                        System.out.println("class case: "+ realvalue.getClass());
+                        System.out.println("realvalue = " + realvalue);
+
+                        // Value soll eine Primitive Variable (z.Bsp: int oder Integer)sei. 
+                        // Ist man in dieser Line gelandet WAR value aber ein Entity object welches hier als Parameter gegeben wird um eben 
+                        // daruas die tatsächliche Variable zu bekommen
+                        row[i] = (value == null) ? "null" : realvalue.toString();
+                    }
                 } catch (NoSuchMethodException e) {
                     row[i] = "(no getter)";
                 }
@@ -55,5 +84,21 @@ public class Tablefier {
             }
             System.out.println();
         }
+    }
+
+    public static Object digdeeper(Object enitity, String field){
+        try {
+            Class<?> entityClass = enitity.getClass();
+            Method getter = entityClass.getMethod("get_" + field);
+            Object value = getter.invoke(enitity);
+            return value;
+        } catch (NoSuchMethodException nsme) {
+            System.out.println("Method named " + "get_" + field  + " does not exist!");
+                } catch (IllegalAccessException iae) {
+            System.out.println("Illegal Access Exception");
+        } catch (InvocationTargetException ite) {
+            System.out.println("Invocation Target Exception");
+        }
+        return null;
     }
 }
