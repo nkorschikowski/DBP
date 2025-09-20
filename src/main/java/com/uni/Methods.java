@@ -87,9 +87,44 @@ public class Methods implements Interface{
 
     public Kategorie getCategoryTree(){
         
+        Session session = sessionFactory.openSession();
+        String hql = "from Kategorie where oberkategorie_id is Null";
+        Query<Kategorie> q = session.createQuery(hql, Kategorie.class);
         Kategorie root = new Kategorie();
+        List<Kategorie> result = q.getResultList();
+        root.set_Unterkategorien(result);
+        for (Kategorie x : root.get_Unterkategorien()){
+            set_unterkategorie(root);
+        }
+        session.close();
         return root;
+        
     }; //TODO: soll ein Tree werden // Parameter = Wurzelknoten?
+
+    public void set_unterkategorie(Kategorie oberkategorie
+    ){
+        Session session = sessionFactory.openSession();
+        
+        try {
+            for (Kategorie x : oberkategorie.get_Unterkategorien()) {
+                String qkat = "from Kategorie where oberkategorie_id.kategorie_id = :id";
+                Query<Kategorie> qk = session.createQuery(qkat);
+                qk.setParameter("id",x.get_kategorie_id());
+                List<Kategorie> unterkategorien = qk.getResultList();
+
+                if(unterkategorien != null && !unterkategorien.isEmpty()){
+                    x.set_Unterkategorien(unterkategorien);
+                    set_unterkategorie(x);
+                }
+            }
+        } catch(Exception e){
+            System.err.println("Hupsala" + e.getMessage());
+        } finally{
+            session.close();
+        }
+        
+        
+    }
 
     public List<Produkt> getProductsByCategoryPath(String categoryPath){
 
