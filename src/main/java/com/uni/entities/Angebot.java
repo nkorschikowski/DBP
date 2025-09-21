@@ -74,7 +74,7 @@ public class Angebot {
         this.angebot_id = angebot_id;
         this.produkt_nr = produkt_nr;
         this.filiale_id = filiale_id;
-        //this.preis = preis;
+        //this.preis = preis; // TODO?
         this.zustand = zustand;
     }
     public Angebot(){}

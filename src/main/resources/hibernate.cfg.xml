@@ -5,15 +5,15 @@
 <hibernate-configuration>
     <session-factory>
         <!--postgresql dialect for dbms-->
-        <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+        <!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property> -->
 
         <!--properties for db connection-->
         <!-- die 4 müssen über Porperty Datei laufen und wird in HibernateUtil.java überschrieben --> 
         <!-- TODO: funktioniert noch nicht (läuft noch über diese cfg)-->
-        <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
+        <!-- <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
         <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/test</property>
         <property name="hibernate.connection.username">test</property>
-        <property name="hibernate.connection.password">test</property>
+        <property name="hibernate.connection.password">test</property> -->
         
         <property name="hibernate.hbm2ddl.auto">update</property>
         <property name="hibernate.show_sql">true</property>

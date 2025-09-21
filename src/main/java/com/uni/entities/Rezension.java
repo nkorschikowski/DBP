@@ -3,6 +3,7 @@ package com.uni.entities;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.IdClass;
@@ -30,6 +31,7 @@ public class Rezension {
     // private date date; //TODO: date
     private String summary;
     private int bewertung; //TODO: small int
+    @Column(columnDefinition = "TEXT")
     private String content;
 
     public Person get_Person_id() {
