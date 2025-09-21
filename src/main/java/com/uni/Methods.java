@@ -2,22 +2,22 @@ package com.uni;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale.Category;
-import com.uni.Tablefier;
+// import java.util.Locale.Category;
+// import com.uni.Tablefier;
 
 import java.util.Scanner;
 
 import com.uni.entities.*;
 
-import com.uni.HibernateUtil;
+// import com.uni.HibernateUtil;
 
 import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.MetadataSources;
-import org.hibernate.boot.registry.StandardServiceRegistry;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+// import org.hibernate.boot.MetadataSources;
+// import org.hibernate.boot.registry.StandardServiceRegistry;
+// import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 
 public class Methods implements Interface{
 
@@ -41,20 +41,26 @@ public class Methods implements Interface{
     public Produkt getProduct(String produkt_nr){
         Session session = sessionFactory.openSession();
         String hql = "from Produkt p where p.produkt_nr = :produkt_nr"; 
-        Query<Produkt> q = session.createQuery(hql);
+        Query<Produkt> q = session.createQuery(hql,Produkt.class);
         q.setParameter("produkt_nr", produkt_nr);
 
         Produkt result = q.uniqueResult();
-        System.out.println(
-            "produkt_nr\ttitel\trating\tverkaufsrank\tbild\tprodukttyp \n" +
-            result.get_produkt_nr() + "\t"+ 
-            result.get_titel() + "\t" + 
-            result.get_rating() + "\t" +
-            result.get_verkaufsrang() + "\t" +
-            result.get_bild() + "\t" +
-            result.get_produkttyp()
-            );
+        List<Produkt> results = new ArrayList<>(); // Tablefier.printTable braucht es als Liste. // TODO: printTable für einzelne Ergebnisse implementieren?
+        results.add(result);
 
+        List<String> headers = new ArrayList<>();
+        headers.add("produkt_nr");
+        headers.add("titel");
+        headers.add("rating");
+        headers.add("verkaufsrang");
+        headers.add("bild");
+        headers.add("produkttyp");
+
+        try {
+            Tablefier.printTable(results, headers);
+        } catch (Exception e) {
+            System.out.println("Tablefier will nicht mehr!");
+        }
         session.close();
         return result; //TODO: was soll man mit return machen?
     };
@@ -62,7 +68,7 @@ public class Methods implements Interface{
     public List<Produkt> getProducts(String pattern){
         Session session = sessionFactory.openSession();
         String hql = "from Produkt where titel LIKE :pattern";
-        Query<Produkt> q = session.createQuery(hql);
+        Query<Produkt> q = session.createQuery(hql,Produkt.class);
         q.setParameter("pattern",pattern); // lt. Aufgabenstellung kann pattern Wildcards enthalten, also nicht Sache der Query
         
         List<Produkt> result = q.getResultList();
@@ -86,7 +92,6 @@ public class Methods implements Interface{
     };
 
     public Kategorie getCategoryTree(){
-        
         Session session = sessionFactory.openSession();
         String hql = "from Kategorie where oberkategorie_id is Null";
         Query<Kategorie> q = session.createQuery(hql, Kategorie.class);
@@ -134,19 +139,19 @@ public class Methods implements Interface{
 
     public List<Produkt> getTopProducts(int k){
         Session session = sessionFactory.openSession();
-        String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1)"; // TODO: ist das sauber? ^^
-        Query<Produkt> q = session.createQuery(hql);
+        String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1) ORDER BY verkaufsrang ASC"; // TODO: ist das sauber? ^^
+        Query<Produkt> q = session.createQuery(hql,Produkt.class);
         q.setParameter("k",k);
         
         List<Produkt> result = q.getResultList();
 
         List<String> headers = new ArrayList<>();
         headers.add("produkt_nr");
-        // headers.add("titel");
-        // headers.add("rating");
+        headers.add("titel");
+        headers.add("rating");
         headers.add("verkaufsrang");
-        // headers.add("bild");
-        // headers.add("produkttyp");
+        headers.add("bild");
+        headers.add("produkttyp");
 
         try {
             Tablefier.printTable(result, headers);
@@ -169,23 +174,19 @@ public class Methods implements Interface{
         Transaction transaction = null;
 
         Scanner sc = new Scanner(System.in);
-        String input;
         Rezension rezension = new Rezension();
         System.out.println("Wie lautet der (genaue) Name der Person?");
-        // input = sc.nextLine();
-        rezension.set_Person_id(getPersonByName("Va")); // TODO: dynamic
+        // rezension.set_Person_id(getPersonByName(sc.nextLine())); // PROD
+        rezension.set_Person_id(getPersonByName("Va")); // TESTING
         System.out.println("Wie lautet die Produktnummer?");
-        // input = sc.nextLine();
-        rezension.set_Produkt_nr(getProduct("B0000668PG")); // TODO: dynamic
+        // rezension.set_Produkt_nr(getProduct(sc.nextLine())); // PROD
+        rezension.set_Produkt_nr(getProduct("B0000668PG")); // TESTING
         System.out.println("Wie lautet die Kurzbeschreibung?");
-        input = sc.nextLine();
-        rezension.set_Summary(input);
+        rezension.set_Summary(sc.nextLine());
         System.out.println("Welche Wertung von 1 bis 5?");
-        input = sc.nextLine();
-        rezension.set_Bewertung(Integer.parseInt(input));
+        rezension.set_Bewertung(Integer.parseInt(sc.nextLine()));
         System.out.println("Inhalt der Rezension?");
-        input = sc.nextLine();
-        rezension.set_Content(input);
+        rezension.set_Content(sc.nextLine());
         sc.close();
     
         try {
@@ -213,7 +214,6 @@ public class Methods implements Interface{
             GROUP BY r.person_id 
                 HAVING AVG(r.bewertung) <=  :maxRating)
         """;
-
         Query<Person> q = session.createQuery(hql,Person.class);
         q.setParameter("maxRating", maxRating);
 
@@ -264,9 +264,10 @@ public class Methods implements Interface{
     public Person getPersonByName(String name){
         Session session = sessionFactory.openSession();
         String hql = "FROM Person WHERE name = :name";         
-        Query<Person> q = session.createQuery(hql);
+        Query<Person> q = session.createQuery(hql,Person.class);
         q.setParameter("name",name);
         Person person = q.uniqueResult();
+        session.close();
 
         return person;
     }

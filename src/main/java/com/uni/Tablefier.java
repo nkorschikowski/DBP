@@ -12,7 +12,7 @@ public class Tablefier {
         }
 
         Class<?> clazz = objects.get(0).getClass();
-        System.out.println("DEGCLASS: " + clazz); //DEBUG
+        // System.out.println("CLASS: " + clazz); //DEBUG
         int cols = fieldNames.size();
 
         // 1. Collect values as strings
@@ -32,30 +32,20 @@ public class Tablefier {
                 try {
                     Method getter = clazz.getMethod(getterName);
                     Object value = getter.invoke(obj);
-                    System.out.println("Started: " + getterName);
+                    // System.out.println("Started: " + getterName); // DEBUG
                     if(value instanceof Number 
                     || value instanceof String 
                     || value instanceof Boolean 
                     || value instanceof Character 
                     || value instanceof java.util.Date
                     || value.getClass().isPrimitive()){
-                        System.out.println("standard case: " + value.getClass());
-                        System.out.println("getter: " + getter);
+                        // System.out.println("standard case: " + value.getClass());// DEBUG 
+                        // System.out.println("getter: " + getter); // DEBUG 
                         row[i] = (value == null) ? "null" : value.toString();
                     } else {
-                        // System.out.println("class case: "+ value.getClass());
-                        // clazz = value.getClass();
-                        // System.out.println("Clazz: " + clazz);
-                        // getter = clazz.getMethod(getterName);
-                        // System.out.println("getter: " + getter);
-                        // value = getter.invoke(value); // bischen wirr die Line ... :
-                        // System.out.print("Ergebnis: " + value);
-                        // // Value soll eine Primitive Variable (z.Bsp: int oder Integer)sei. 
-                        // // Ist man in dieser Line gelandet WAR value aber ein Entity object welches hier als Parameter gegeben wird um eben 
-                        // // daruas die tatsächliche Variable zu bekommen
                         Object realvalue = digdeeper(value,field);
-                        System.out.println("class case: "+ realvalue.getClass());
-                        System.out.println("realvalue = " + realvalue);
+                        // System.out.println("class case: "+ realvalue.getClass()); // DEBUG 
+                        // System.out.println("realvalue = " + realvalue); // DEBUG 
 
                         // Value soll eine Primitive Variable (z.Bsp: int oder Integer)sei. 
                         // Ist man in dieser Line gelandet WAR value aber ein Entity object welches hier als Parameter gegeben wird um eben 

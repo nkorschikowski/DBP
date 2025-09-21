@@ -43,7 +43,7 @@ public class Kategorie{
     public String get_name(){
         return this.name;
     }
-    public void set_name(){
+    public void set_name(String name){
         this.name = name;
     }
     public Kategorie get_oberkategorie_id() {
