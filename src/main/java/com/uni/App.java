@@ -11,6 +11,8 @@ public class App
         boolean state = true;
         Interface meth = new Methods();
         Scanner sc = new Scanner(System.in);
+        //für testing
+        Kategorie wurzel = new Kategorie();
         
         System.out.println("Die Anwendung ist bereit!");
         System.out.println("Eingabe wird erwartet ...");
@@ -35,10 +37,14 @@ public class App
                     meth.getProducts(sc.nextLine()); // PROD
                     break;
                 case "getCategoryTree":
-                    meth.getCategoryTree();
+                    //wurzel in main methode laden
+                    wurzel = meth.getCategoryTree();
+                    System.out.println("wurzel erstellt...");
                     break;
                 case "getProductsByCategoryPath": // TODO
-                    System.out.println("TODO");
+                    //per gespeichertem wurzelobjekt aufrufen
+                    //änderungen an interface und methode :-(
+                    meth.getProductsByCategoryPath(wurzel);
                     break;
                 case "getTopProducts":
                     System.out.println("Gib das Threshhold an");
