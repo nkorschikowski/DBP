@@ -50,8 +50,10 @@ public class App
                     System.out.println("Gib das Threshhold an");
                     meth.getTopProducts(Integer.parseInt(sc.nextLine())); // PROD
                     break;
-                case "getSimilarCheaperProduct": // TODO
-                    System.out.println("TODO");
+                case "getSimilarCheaperProduct":
+                System.out.println("Gib die Produktnummer ein!");
+                // meth.getSimilarCheaperProduct(sc.nextLine()); // PROD
+                meth.getSimilarCheaperProduct("3937825061"); // TESTING
                     break;
                 case "addNewReview":
                     meth.addNewReview();

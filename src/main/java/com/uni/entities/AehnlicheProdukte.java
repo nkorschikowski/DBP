@@ -20,7 +20,7 @@ public class AehnlicheProdukte {
     @JoinColumn(name = "produkt_nr1", referencedColumnName = "produkt_nr", nullable = true)
     private Produkt produkt_nr1;
     @Id
-    private String produkt_nr2;
+    private Produkt produkt_nr2;
 
     public Produkt get_produkt_nr1(){
         return produkt_nr1;
@@ -28,15 +28,15 @@ public class AehnlicheProdukte {
     public void set_produkt_nr1(Produkt produkt_nr1){
         this.produkt_nr1 = produkt_nr1;
     }
-    public String get_produkt_nr2(){
+    public Produkt get_produkt_nr2(){
         return produkt_nr2;
     }
-    public void set_produkt_nr2(String produkt_nr2){
+    public void set_produkt_nr2(Produkt produkt_nr2){
         this.produkt_nr2 = produkt_nr2;
     }
 
     public AehnlicheProdukte(Produkt produkt_nr1,
-    String produkt_nr2){
+    Produkt produkt_nr2){
         this.produkt_nr1 = produkt_nr1;
         this.produkt_nr2 = produkt_nr2; 
     }
