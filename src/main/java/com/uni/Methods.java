@@ -132,35 +132,73 @@ public class Methods implements Interface{
         }   
     }
 
-    public List<Produkt> getProdutcsByCategoryPath(String input,
+        public List<Produkt> getProdutcsByCategoryPath(String input,
     Kategorie knoten
     ){
-        List<Produkt> result = new ArrayList<>();
         //Kategorie knoten = getCategoryTree();
         String regex = "[\\\\/,\\.#_-]";
-        String[] fd = input.split(regex);
+        String[] knoten_pfad = input.split(regex);
 
         
-        for (String s1 : fd) {
-            if(!s1.isEmpty()){
+        for (String knot : knoten_pfad) {
+            if(!knot.isEmpty()){
                 List<Kategorie> unterkategorien = knoten.get_Unterkategorien();
                 int kat_postion = 0;
                 for (Kategorie x : unterkategorien){
-                    if (x.get_name().equals(s1)){
-                        kat_postion = unterkategorien.indexOf(x);
+                    if (x.get_name().equals(knot)){
+                        knoten = x;
+                        System.out.println("visiting... " + knoten.get_name());
                         break;
                     }
                 }
-                knoten = unterkategorien.get(kat_postion);
-                System.out.println("visiting... " + knoten.get_name());
             }
         }
-        System.out.println("Zielkategorie: " + knoten.get_name());
+        System.out.println("Zielkategorie erreicht... ");
         System.out.println("Produkte für Zielkatergorie suchen...");
 
+        //knoten trversieren und kategorieids speichern 
+        List<Produkt> produkte = getAlleProdukte(knoten);
 
-        return result;
+        List<String> headers = new ArrayList<>();
+        headers.add("produkt_nr");
+        headers.add("titel");
+        headers.add("rating");
+        headers.add("verkaufsrang");
+        headers.add("bild");
+        headers.add("produkttyp");
+
+        try {
+            Tablefier.printTable(produkte, headers);
+        } catch (Exception e) {
+            System.out.println("Tablefier will nicht mehr!");
+        }
+
+
+        return produkte;
     };
+
+
+    public List<Produkt> getAlleProdukte(Kategorie kat){
+    List<Produkt> summeUnterkategorie = new ArrayList<>();
+    List<Kategorie> childs = kat.get_Unterkategorien();
+    for(Kategorie ukat : childs){
+        summeUnterkategorie.addAll(getAlleProdukte(ukat));
+    }
+    getProductByCategory(kat);
+    return summeUnterkategorie;
+    }
+        
+    public List<Produkt> getProductByCategory(Kategorie kat){
+    Session session = sessionFactory.openSession();
+            Kategorie Kat = session.get(Kategorie.class,kat);
+            String hql = "FROM Produkt p WHERE p IN (SELECT produkt_nr FROM produkte_kategorie WHERE kategorie_id = :kat)";
+            Query<Produkt> q = session.createQuery(hql,Produkt.class);
+            q.setParameter("kat", kat);
+
+            List<Produkt> produkte = q.getResultList();
+            session.close();
+            return produkte;
+    }
 
     public List<Produkt> getTopProducts(int k){
         Session session = sessionFactory.openSession();
