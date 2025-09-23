@@ -185,36 +185,34 @@ public class Methods implements Interface{
 
     public List<Produkt> getSimilarCheaperProduct(String produkt_nr){
         Session session = sessionFactory.openSession();
-        // // ANGEBOT:
-        // SELECT *
-        // FROM angebote
-        // WHERE produkt_nr IN (SELECT * FROM (SELECT produkt_nr2 as produkt_nr FROM aehnliche_produkte WHERE produkt_nr1 = '3937825061'
-        // UNION
-        // SELECT produkt_nr1 as produkt_nr FROM aehnliche_produkte WHERE produkt_nr2 = '3937825061'))
-        // AND preis < (
-        //     SELECT MAX(preis)
-        //     from angebote 
-        //     WHERE produkt_nr = '3937825061');
 
-        // // PRODUKT:
-        // SELECT *
-        // FROM produkte
-        // WHERE produkt_nr IN (
-        // SELECT produkt_nr
-        // FROM angebote
-        // WHERE produkt_nr IN (SELECT * FROM (SELECT produkt_nr2 as produkt_nr FROM aehnliche_produkte WHERE produkt_nr1 = '3937825061'
-        // UNION
-        // SELECT produkt_nr1 as produkt_nr FROM aehnliche_produkte WHERE produkt_nr2 = '3937825061'))
-        // AND preis < (
-        //     SELECT MAX(preis)
-        //     from angebote 
-        //     WHERE produkt_nr = '3937825061')
-        
         // HQL akzeptiert kein SELECT von einer Subquery und unterstützt wohl auch kein UNION
+        // DAS IST DIE ALTE VARIANTE DIE FUNKTIONIERT ABER UNCOOL IST
+        // // String hql = """
+        // // FROM Produkt p
+        // // WHERE p.produkt_nr IN (
+        // //     SELECT a.produkt_nr.produkt_nr
+        // //     FROM Angebot a
+        // //     WHERE 
+        // //         (a.produkt_nr.produkt_nr IN (
+        // //             SELECT ap.produkt_nr2.produkt_nr FROM AehnlicheProdukte ap WHERE ap.produkt_nr1.produkt_nr = :produkt_nrA
+        // //         ) 
+        // //         OR a.produkt_nr.produkt_nr IN (
+        // //             SELECT ap.produkt_nr1.produkt_nr FROM AehnlicheProdukte ap WHERE ap.produkt_nr2.produkt_nr = :produkt_nrB
+        // //         ))
+        // //         AND a.preis < (
+        // //             SELECT MAX(a2.preis)
+        // //             FROM Angebot a2
+        // //             WHERE a2.produkt_nr.produkt_nr = :produkt_nrC
+        // //         )
+        // // )
+        // // """;
+
+        Produkt unserProdukt = session.get(Produkt.class, produkt_nr);
         String hql = """
         FROM Produkt p
-        WHERE p.produkt_nr IN (
-            SELECT a.produkt_nr.produkt_nr
+        WHERE p IN (
+            SELECT a.produkt_nr
             FROM Angebot a
             WHERE 
                 (a.produkt_nr IN (
@@ -230,18 +228,20 @@ public class Methods implements Interface{
                 )
         )
         """;
+
         Query<Produkt> q = session.createQuery(hql,Produkt.class);
-        q.setParameter("produkt_nrA", produkt_nr);
-        q.setParameter("produkt_nrB", produkt_nr);
-        q.setParameter("produkt_nrC", produkt_nr);
+        q.setParameter("produkt_nrA", unserProdukt);
+        q.setParameter("produkt_nrB", unserProdukt);
+        q.setParameter("produkt_nrC", unserProdukt);
         List<Produkt> result = q.getResultList();
 
         List<String> headers = new ArrayList<>();
-        headers.add("angebot_id");
         headers.add("produkt_nr");
-        headers.add("filiale_id");
-        headers.add("preis");
-        headers.add("zustand");
+        headers.add("titel");
+        headers.add("rating");
+        headers.add("verkaufsrang");
+        headers.add("bild");
+        headers.add("produkttyp");
 
         try {
             Tablefier.printTable(result, headers);

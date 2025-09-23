@@ -1,6 +1,7 @@
 package com.uni;
 
 import java.util.Scanner;
+import com.uni.entities.Kategorie;
 
 
 
