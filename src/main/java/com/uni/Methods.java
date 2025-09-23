@@ -132,26 +132,31 @@ public class Methods implements Interface{
         }   
     }
 
-    public List<Produkt> getProductsByCategoryPath(Kategorie wurzel){
-
+    public List<Produkt> getProdutcsByCategoryPath(String input,
+    Kategorie knoten
+    ){
         List<Produkt> result = new ArrayList<>();
-
         //Kategorie knoten = getCategoryTree();
-        Kategorie knoten = wurzel;
-        System.out.println("Kategorie suchen...");
-        List<Integer> pfad = new ArrayList<>();
+        String regex = "[\\\\/,\\.#_-]";
+        String[] fd = input.split(regex);
 
-
-        pfad.add(2);
-        pfad.add(0);
-        pfad.add(4);
-
-        for (int i : pfad){
-            List<Kategorie> unterkategorien = knoten.get_Unterkategorien();
-            knoten = unterkategorien.get(i);
-            System.out.println(knoten.get_name());
-            System.out.println(knoten.get_Unterkategorien());
+        
+        for (String s1 : fd) {
+            if(!s1.isEmpty()){
+                List<Kategorie> unterkategorien = knoten.get_Unterkategorien();
+                int kat_postion = 0;
+                for (Kategorie x : unterkategorien){
+                    if (x.get_name().equals(s1)){
+                        kat_postion = unterkategorien.indexOf(x);
+                        break;
+                    }
+                }
+                knoten = unterkategorien.get(kat_postion);
+                System.out.println("visiting... " + knoten.get_name());
+            }
         }
+        System.out.println("Zielkategorie: " + knoten.get_name());
+        System.out.println("Produkte für Zielkatergorie suchen...");
 
 
         return result;
