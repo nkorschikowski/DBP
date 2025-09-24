@@ -4,20 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 // import java.util.Locale.Category;
 // import com.uni.Tablefier;
-
 import java.util.Scanner;
 
-import com.uni.entities.*;
-
-// import com.uni.HibernateUtil;
-
-import org.hibernate.query.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 // import org.hibernate.boot.MetadataSources;
 // import org.hibernate.boot.registry.StandardServiceRegistry;
 // import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+
+// import com.uni.HibernateUtil;
+
+import org.hibernate.query.Query;
+
+import com.uni.entities.Angebot;
+import com.uni.entities.Kategorie;
+import com.uni.entities.Person;
+import com.uni.entities.Produkt;
+import com.uni.entities.Rezension;
 
 public class Methods implements Interface{
 
@@ -156,7 +160,7 @@ public class Methods implements Interface{
         System.out.println("Zielkategorie erreicht... ");
         System.out.println("Produkte für Zielkatergorie suchen...");
 
-        //knoten trversieren und kategorieids speichern 
+//knoten trversieren und kategorieids speichern 
         List<Produkt> produkte = getAlleProdukte(knoten);
 
         List<String> headers = new ArrayList<>();
@@ -204,9 +208,40 @@ public List<Produkt> getAlleProdukte(Kategorie kat){
             return produkte;
     }
 
-    public List<Produkt> getTopProducts(int k){
+    public List<Produkt> getTopProductsRANKING(int k){
         Session session = sessionFactory.openSession();
         String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1) ORDER BY verkaufsrang ASC"; // TODO: ist das sauber? ^^
+        Query<Produkt> q = session.createQuery(hql,Produkt.class);
+        q.setParameter("k",k);
+        
+        List<Produkt> result = q.getResultList();
+
+        List<String> headers = new ArrayList<>();
+        headers.add("produkt_nr");
+        headers.add("titel");
+        headers.add("rating");
+        headers.add("verkaufsrang");
+        headers.add("bild");
+        headers.add("produkttyp");
+
+        try {
+            Tablefier.printTable(result, headers);
+        } catch (Exception e) {
+            System.out.println("Tablefier will nicht mehr!");
+        }
+        session.close();
+
+        return result;
+    };
+
+    public List<Produkt> getTopProductsRATING(int k){
+        Session session = sessionFactory.openSession();
+        String hql = """
+            
+            FROM Produkt p JOIN Rezension r ON p.produkt_nr = r.produkt_nr.produkt_nr
+            GROUP BY p.produkt_nr 
+            ORDER BY p.rating DESC, count(r.person_id) DESC, p.titel ASC LIMIT :k  
+                """;
         Query<Produkt> q = session.createQuery(hql,Produkt.class);
         q.setParameter("k",k);
         

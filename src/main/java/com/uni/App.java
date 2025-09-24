@@ -47,9 +47,13 @@ public class App
                     //änderungen an interface und methode :-(
                     meth.getProductsByCategoryPath(wurzel);
                     break;
-                case "getTopProducts":
+                case "getTopProductsRANKING":
                     System.out.println("Gib das Threshhold an");
-                    meth.getTopProducts(Integer.parseInt(sc.nextLine())); // PROD
+                    meth.getTopProductsRANKING(Integer.parseInt(sc.nextLine())); // PROD
+                    break;
+                case "getTopProductsRATING":
+                    System.out.println("Gib das Threshhold an");
+                    meth.getTopProductsRATING(Integer.parseInt(sc.nextLine())); // PROD
                     break;
                 case "getSimilarCheaperProduct":
                 System.out.println("Gib die Produktnummer ein!");

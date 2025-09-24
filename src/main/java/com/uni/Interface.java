@@ -34,7 +34,8 @@ public interface Interface {
     // der zugeordneten Produkte ermittelt werden. Die Angabe des Pfades ist notwendig, da der Kategorienname 
     // allein nicht eindeutig ist.
 
-    List<Produkt> getTopProducts(int k);
+    List<Produkt> getTopProductsRANKING(int k);
+    List<Produkt> getTopProductsRATING(int k);
     // Diese Methode liefert eine Liste aller Produkte zurück, die unter den Top k sind basierend auf dem Rating.
 
     List<Produkt> getSimilarCheaperProduct(String produkt_nr);
