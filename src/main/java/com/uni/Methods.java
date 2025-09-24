@@ -178,22 +178,26 @@ public class Methods implements Interface{
     };
 
 
-    public List<Produkt> getAlleProdukte(Kategorie kat){
+public List<Produkt> getAlleProdukte(Kategorie kat){
     List<Produkt> summeUnterkategorie = new ArrayList<>();
-    List<Kategorie> childs = kat.get_Unterkategorien();
-    for(Kategorie ukat : childs){
+
+    // add products of current category
+    summeUnterkategorie.addAll(getProductByCategory(kat));
+
+    // recurse into children
+    for (Kategorie ukat : kat.get_Unterkategorien()) {
         summeUnterkategorie.addAll(getAlleProdukte(ukat));
     }
-    getProductByCategory(kat);
+
     return summeUnterkategorie;
     }
         
     public List<Produkt> getProductByCategory(Kategorie kat){
     Session session = sessionFactory.openSession();
-            Kategorie Kat = session.get(Kategorie.class,kat);
-            String hql = "FROM Produkt p WHERE p IN (SELECT produkt_nr FROM produkte_kategorie WHERE kategorie_id = :kat)";
+            Kategorie Kat = session.get(Kategorie.class,kat.get_kategorie_id());
+            String hql = "FROM Produkt p WHERE p IN (SELECT produkt_nr FROM ProduktKategorie WHERE kategorie_id.kategorie_id = :kat_id)";
             Query<Produkt> q = session.createQuery(hql,Produkt.class);
-            q.setParameter("kat", kat);
+            q.setParameter("kat_id", kat.get_kategorie_id());
 
             List<Produkt> produkte = q.getResultList();
             session.close();
