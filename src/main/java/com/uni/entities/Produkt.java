@@ -70,5 +70,22 @@ public class Produkt {
         this.bild = bild;
         this.produkttyp = produkttyp;
     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Produkt)) return false;
+        Produkt produkt = (Produkt) o;
+        return Double.compare(produkt.rating, rating) == 0 &&
+               verkaufsrang == produkt.verkaufsrang &&
+               Objects.equals(produkt_nr, produkt.produkt_nr) &&
+               Objects.equals(titel, produkt.titel) &&
+               Objects.equals(bild, produkt.bild) &&
+               Objects.equals(produkttyp, produkt.produkttyp);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(produkt_nr, titel, rating, verkaufsrang, bild, produkttyp);
+    }
 
 }
