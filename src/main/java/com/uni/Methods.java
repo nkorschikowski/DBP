@@ -24,7 +24,7 @@ public class Methods implements Interface{
     
     public void init(){ // TODO
         System.out.println("Die Sitzung wird aufgebaut!"); // LOG
-        sessionFactory = HibernateUtil.getSessionFactory();
+        sessionFactory = HibernateUtil.buildSessionFactory();
         //das laden der Properties ist in HibernateUtil geregelt
         System.out.println("Sitzungsaufbau abgeschlossen!"); // LOG
     };

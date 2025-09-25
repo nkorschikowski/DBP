@@ -45,6 +45,7 @@ public class App
                 case "getProducts":
                     System.out.println("Gib das Pattern an! Wildcards (%) sind erlaubt!");
                     meth.getProducts(sc.nextLine());
+                    break;
                 case "getCategoryTree":
                     wurzel = meth.getCategoryTree();
                     TreeNode treeRoot = printer.convertToTreeNode(wurzel);
