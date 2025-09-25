@@ -299,14 +299,13 @@ public class Methods implements Interface{
         System.out.println("Wie lautet der (genaue) Name der Person?");
         rezension.set_Person_id(getPersonByName(sc.nextLine()));
         System.out.println("Wie lautet die Produktnummer?");
-        rezension.set_Produkt_nr(getProduct(sc.nextLine()));
+        rezension.set_Produkt_nr(getProductObject(sc.nextLine()));
         System.out.println("Wie lautet die Kurzbeschreibung?");
         rezension.set_Summary(sc.nextLine());
         System.out.println("Welche Wertung von 1 bis 5?");
         rezension.set_Bewertung(Integer.parseInt(sc.nextLine()));
         System.out.println("Inhalt der Rezension?");
         rezension.set_Content(sc.nextLine());
-        sc.close();
     
         try {
             transaction = session.beginTransaction();
@@ -389,5 +388,15 @@ public class Methods implements Interface{
         session.close();
 
         return person;
+    }
+
+    public Produkt getProductObject(String produkt_nr){
+        Session session = sessionFactory.openSession();
+        String hql = "from Produkt p where p.produkt_nr = :produkt_nr"; 
+        Query<Produkt> q = session.createQuery(hql,Produkt.class);
+        q.setParameter("produkt_nr", produkt_nr);
+
+        Produkt result = q.uniqueResult();
+        return result;
     }
 }

@@ -18,11 +18,11 @@ public class App
     public static void main( String[] args )
     {
         Logger.getLogger("org.hibernate").setLevel(Level.SEVERE); // To clean up hibernate Logging
+        
         boolean loop = true;
+        Kategorie wurzel = new Kategorie();
         Interface meth = new Methods();
         Scanner sc = new Scanner(System.in);
-        
-        Kategorie wurzel = new Kategorie();
         Tablefier printer = new Tablefier();
         
         System.out.println("Die Anwendung ist bereit!");
