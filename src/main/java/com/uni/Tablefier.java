@@ -99,16 +99,22 @@ public class Tablefier {
     }
     
      public void printTree(Kategorie wurzel){
-        SimpleTreeNode rootNode = new SimpleTreeNode(wurzel.get_name());
+        String label = wurzel.get_name() != null ? wurzel.get_name() : "<unnamed>";
+        SimpleTreeNode rootNode = new SimpleTreeNode(label);
+            
+        
         for (Kategorie children : wurzel.get_Unterkategorien()){
-            rootNode.addChild(new SimpleTreeNode(children.get_name()));
+            label = wurzel.get_name() != null ? wurzel.get_name() : "<unnamed>";
+            SimpleTreeNode node = new SimpleTreeNode(label);
+           
 
         }
         
     }
 
     public SimpleTreeNode convertToTreeNode(Kategorie kategorie) {
-        SimpleTreeNode node = new SimpleTreeNode(kategorie.get_name());
+        String name = kategorie.get_name() != null ? kategorie.get_name() : "<unnamed>";
+        SimpleTreeNode node = new SimpleTreeNode(name);
         for (Kategorie child : kategorie.get_Unterkategorien()) {
             node.addChild(convertToTreeNode(child));
         }
