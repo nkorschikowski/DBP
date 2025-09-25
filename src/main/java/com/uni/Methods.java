@@ -136,7 +136,7 @@ public class Methods implements Interface{
         }   
     }
 
-        public List<Produkt> getProdutcsByCategoryPath(
+        public List<Produkt> getProductsByCategoryPath(
     Kategorie knoten, String input
     ){
         //Kategorie knoten = getCategoryTree();
