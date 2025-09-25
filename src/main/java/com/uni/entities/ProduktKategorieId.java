@@ -1,6 +1,8 @@
 package com.uni.entities;
 
-public class ProduktKategorieId {
+import java.io.Serializable;
+
+public class ProduktKategorieId implements Serializable{
     private String produkt_nr;
     private int kategorie_id;
 
