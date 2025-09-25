@@ -1,7 +1,12 @@
 package com.uni;
 
 import java.util.Scanner;
+
 import com.uni.entities.Kategorie;
+
+import hu.webarticum.treeprinter.TreeNode;
+import hu.webarticum.treeprinter.printer.listing.ListingTreePrinter;
+
 
 
 
@@ -14,10 +19,11 @@ public class App
         Scanner sc = new Scanner(System.in);
         //für testing
         Kategorie wurzel = new Kategorie();
+        Tablefier printer = new Tablefier();
         
         System.out.println("Die Anwendung ist bereit!");
         System.out.println("Eingabe wird erwartet ...");
-        meth.init(); // TESTING
+
 
         while(state){
             String input = sc.nextLine();
@@ -46,12 +52,12 @@ public class App
                     new ListingTreePrinter().print(treeRoot);
                     
                     break;
-                 case "getProdutcsByCategoryPath": // TODO
+                 case "getProductsByCategoryPath": // TODO
                     System.out.println("Eingabe des Pfades wird erwartet ...");
                     String knotenPfad = sc.nextLine();
 
                     String pfad = "/Formats/Audio CDs/"; //Mystery & Thrillers
-                    meth.getProdutcsByCategoryPath(pfad,wurzel);
+                    meth.getProductsByCategoryPath(wurzel, pfad);
                     break;
                 case "getTopProductsRANKING":
                     System.out.println("Gib das Threshhold an");
