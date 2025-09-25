@@ -91,4 +91,21 @@ public class Tablefier {
         }
         return null;
     }
+    
+     public void printTree(Kategorie wurzel){
+        SimpleTreeNode rootNode = new SimpleTreeNode(wurzel.get_name());
+        for (Kategorie children : wurzel.get_Unterkategorien()){
+            rootNode.addChild(new SimpleTreeNode(children.get_Unterkategorien()));
+
+        }
+        
+    }
+
+    private static TreeNode convertToTreeNode(Kategorie kategorie) {
+        SimpleTreeNode node = new SimpleTreeNode(kategorie.getName());
+        for (Kategorie child : kategorie.getChildren()) {
+            node.addChild(convertToTreeNode(child));
+        }
+        return node;
+    }
 }
