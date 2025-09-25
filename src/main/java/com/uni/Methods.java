@@ -136,8 +136,8 @@ public class Methods implements Interface{
         }   
     }
 
-        public List<Produkt> getProdutcsByCategoryPath(String input,
-    Kategorie knoten
+        public List<Produkt> getProdutcsByCategoryPath(
+    Kategorie knoten, String input
     ){
         //Kategorie knoten = getCategoryTree();
         String regex = "[\\\\/,\\.#_-]";

@@ -23,7 +23,7 @@ public class App
         
         System.out.println("Die Anwendung ist bereit!");
         System.out.println("Eingabe wird erwartet ...");
-
+        meth.init(); // TESTING
 
         while(state){
             String input = sc.nextLine();
@@ -40,7 +40,7 @@ public class App
                     // meth.getProduct("B0000668PG"); //TESTING
                     break;
                 case "getProducts":
-                    System.out.println("Gib das Pattern an!");
+                    System.out.println("Gib das Pattern an! Wildcards (%) sind erlaubt!");
                     meth.getProducts(sc.nextLine()); // PROD
                     break;
                 case "getCategoryTree":
@@ -60,12 +60,12 @@ public class App
                     meth.getProductsByCategoryPath(wurzel, pfad);
                     break;
                 case "getTopProductsRANKING":
-                    System.out.println("Gib das Threshhold an");
-                    meth.getTopProductsRANKING(Integer.parseInt(sc.nextLine())); // PROD
+                    System.out.println("Bis zu welchem Verkaufsrang?");
+                    meth.getTopProductsRANKING(readInteger(sc)); // PROD
                     break;
                 case "getTopProductsRATING":
-                    System.out.println("Gib das Threshhold an");
-                    meth.getTopProductsRATING(Integer.parseInt(sc.nextLine())); // PROD
+                    System.out.println("Der ersten wieviel Plätze?");
+                    meth.getTopProductsRATING(readInteger(sc)); // PROD
                     break;
                 case "getSimilarCheaperProduct":
                 System.out.println("Gib die Produktnummer ein!");
@@ -77,7 +77,7 @@ public class App
                     break;
                 case "getTrolls":
                     System.out.println("Was soll die maximale Durchschnittsbewertung sein? z.B. 3.8 (inklusiv)");
-                    meth.getTrolls(Double.parseDouble(sc.nextLine())); // PROD
+                    meth.getTrolls(readDouble(sc)); // PROD
                     break;
                 case "getOffers":
                     System.out.println("Wie lautet die Produktnummer?");
@@ -110,5 +110,25 @@ public class App
             }
         }
 
+    }
+
+    public static double readDouble(Scanner sc){
+        while (true){
+            try{
+                return Double.parseDouble(sc.nextLine());
+            } catch (Exception e) {
+                System.out.println("Hier lief was schief. Das war warhscheinlich keine Dezimalzahl. Versuche es erneut!");
+            }
+        }
+    }
+
+    public static int readInteger(Scanner sc){
+    while (true){
+        try{
+            return Integer.parseInt(sc.nextLine());
+        } catch (Exception e) {
+            System.out.println("Hier lief was schief. Das war warhscheinlich keine Ganzzahl. Versuche es erneut!");
+        }
+    }
     }
 }

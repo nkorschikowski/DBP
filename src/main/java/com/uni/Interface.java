@@ -29,7 +29,7 @@ public interface Interface {
     // Jeder Knoten ist dabei vom Typ Category und kann eine Liste von Unterknoten (d.h. Unterkategorien) enthalten.
 
 
-    List<Produkt> getProductsByCategoryPath(Kategorie categoryPath);
+    List<Produkt> getProductsByCategoryPath(Kategorie wurzel, String categoryPath);
     // Nach Angabe einer Kategorie (definiert durch den Pfad von der Wurzel zu sich selbst) soll die Liste
     // der zugeordneten Produkte ermittelt werden. Die Angabe des Pfades ist notwendig, da der Kategorienname 
     // allein nicht eindeutig ist.
