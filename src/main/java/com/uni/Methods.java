@@ -2,6 +2,8 @@ package com.uni;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 // import java.util.Locale.Category;
 // import com.uni.Tablefier;
 import java.util.Scanner;
@@ -162,7 +164,9 @@ public class Methods implements Interface{
 
 //knoten trversieren und kategorieids speichern 
         List<Produkt> produkte = getAlleProdukte(knoten);
-
+        Set<Produkt> produkteSet = new HashSet<>(produkte);
+        produkte = new ArrayList<>(produkteSet);
+        
         List<String> headers = new ArrayList<>();
         headers.add("produkt_nr");
         headers.add("titel");
