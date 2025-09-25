@@ -1,22 +1,15 @@
 package com.uni;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.HashSet;
-// import java.util.Locale.Category;
-// import com.uni.Tablefier;
+
 import java.util.Scanner;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-// import org.hibernate.boot.MetadataSources;
-// import org.hibernate.boot.registry.StandardServiceRegistry;
-// import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-
-// import com.uni.HibernateUtil;
-
 import org.hibernate.query.Query;
 
 import com.uni.entities.Angebot;
@@ -29,14 +22,14 @@ public class Methods implements Interface{
 
     private SessionFactory sessionFactory;
     
-    public void init(){
+    public void init(){ // TODO
         System.out.println("Die Sitzung wird aufgebaut!"); // LOG
         sessionFactory = HibernateUtil.getSessionFactory();
         //das laden der Properties ist in HibernateUtil geregelt
         System.out.println("Sitzungsaufbau abgeschlossen!"); // LOG
     };
 
-    public void finish(){
+    public void finish(){ // TODO
         System.out.println("Sitzund wird beendet"); // LOG
         if(sessionFactory!=null){
             sessionFactory.close();
@@ -51,7 +44,7 @@ public class Methods implements Interface{
         q.setParameter("produkt_nr", produkt_nr);
 
         Produkt result = q.uniqueResult();
-        List<Produkt> results = new ArrayList<>(); // Tablefier.printTable braucht es als Liste. // TODO: printTable für einzelne Ergebnisse implementieren?
+        List<Produkt> results = new ArrayList<>(); // Tablefier.printTable braucht es als Liste.
         results.add(result);
 
         List<String> headers = new ArrayList<>();
@@ -68,14 +61,14 @@ public class Methods implements Interface{
             System.out.println("Tablefier will nicht mehr!");
         }
         session.close();
-        return result; //TODO: was soll man mit return machen?
+        return result;
     };
 
     public List<Produkt> getProducts(String pattern){
         Session session = sessionFactory.openSession();
         String hql = "from Produkt where titel LIKE :pattern";
         Query<Produkt> q = session.createQuery(hql,Produkt.class);
-        q.setParameter("pattern",pattern); // lt. Aufgabenstellung kann pattern Wildcards enthalten, also nicht Sache der Query
+        q.setParameter("pattern",pattern); 
         
         List<Produkt> result = q.getResultList();
 
@@ -98,7 +91,6 @@ public class Methods implements Interface{
     };
 
     public Kategorie getCategoryTree(){
-        
         Session session = sessionFactory.openSession();
         String hql = "from Kategorie where oberkategorie_id is Null";
         Query<Kategorie> q = session.createQuery(hql, Kategorie.class);
@@ -111,60 +103,49 @@ public class Methods implements Interface{
         session.close();
 
         return root;
-        
-    }; //TODO: soll ein Tree werden // Parameter = Wurzelknoten?
+    };
 
-    public void set_knoten_unterkategorien(Kategorie oberkategorie
-    ){
-        Session session = sessionFactory.openSession();
+        // Helper for getCategoryTree
+        public void set_knoten_unterkategorien(Kategorie oberkategorie){
+            Session session = sessionFactory.openSession();
+            String qkat = "from Kategorie where oberkategorie_id.kategorie_id = :id";
+            Query<Kategorie> qk = session.createQuery(qkat,Kategorie.class);
+            qk.setParameter("id",oberkategorie.get_kategorie_id());
+            List<Kategorie> unterkategorien = qk.getResultList();
+            oberkategorie.set_Unterkategorien(unterkategorien);
+            
+            try {
+                for (Kategorie x : oberkategorie.get_Unterkategorien()) {
 
-        String qkat = "from Kategorie where oberkategorie_id.kategorie_id = :id";
-        Query<Kategorie> qk = session.createQuery(qkat);
-        qk.setParameter("id",oberkategorie.get_kategorie_id());
-        List<Kategorie> unterkategorien = qk.getResultList();
-        oberkategorie.set_Unterkategorien(unterkategorien);
-        
-        try {
-            for (Kategorie x : oberkategorie.get_Unterkategorien()) {
-
-                if(unterkategorien != null && !unterkategorien.isEmpty()){
-                    set_knoten_unterkategorien(x);
+                    if(unterkategorien != null && !unterkategorien.isEmpty()){
+                        set_knoten_unterkategorien(x);
+                    }
                 }
-            }
-        } catch(Exception e){
-            System.err.println("Hupsala" + e.getMessage());
-        } finally{
-            session.close();
-        }   
-    }
+            } catch(Exception e){
+                System.err.println("Hupsala" + e.getMessage());
+            } finally{
+                session.close();
+            }   
+        }
 
-        public List<Produkt> getProductsByCategoryPath(
-    Kategorie knoten, String input
-    ){
-        //Kategorie knoten = getCategoryTree();
+    public List<Produkt> getProductsByCategoryPath(Kategorie knoten, String input){
         String regex = "[\\\\/,\\.#_-]";
         String[] knoten_pfad = input.split(regex);
 
-        
         for (String knot : knoten_pfad) {
             if(!knot.isEmpty()){
                 List<Kategorie> unterkategorien = knoten.get_Unterkategorien();
-                int kat_postion = 0;
                 for (Kategorie x : unterkategorien){
                     if (x.get_name().equals(knot)){
                         knoten = x;
-                        System.out.println("visiting... " + knoten.get_name());
                         break;
                     }
                 }
             }
         }
-        System.out.println("Zielkategorie erreicht... ");
-        System.out.println("Produkte für Zielkatergorie suchen...");
 
-//knoten trversieren und kategorieids speichern 
         List<Produkt> produkte = getAlleProdukte(knoten);
-        Set<Produkt> produkteSet = new HashSet<>(produkte);
+        Set<Produkt> produkteSet = new HashSet<>(produkte); // eliminiert Duplikate
         produkte = new ArrayList<>(produkteSet);
         
         List<String> headers = new ArrayList<>();
@@ -181,28 +162,23 @@ public class Methods implements Interface{
             System.out.println("Tablefier will nicht mehr!");
         }
 
-
         return produkte;
     };
 
-
-public List<Produkt> getAlleProdukte(Kategorie kat){
-    List<Produkt> summeUnterkategorie = new ArrayList<>();
-
-    // add products of current category
-    summeUnterkategorie.addAll(getProductByCategory(kat));
-
-    // recurse into children
-    for (Kategorie ukat : kat.get_Unterkategorien()) {
-        summeUnterkategorie.addAll(getAlleProdukte(ukat));
-    }
-
-    return summeUnterkategorie;
-    }
-        
-    public List<Produkt> getProductByCategory(Kategorie kat){
-    Session session = sessionFactory.openSession();
-            Kategorie Kat = session.get(Kategorie.class,kat.get_kategorie_id());
+        // Helper für getProductsByCategoryPath
+        public List<Produkt> getAlleProdukte(Kategorie kat){
+            List<Produkt> summeUnterkategorie = new ArrayList<>();
+            //füge Produkte der aktuellen Kategorie hinzu
+            summeUnterkategorie.addAll(getProductByCategory(kat));
+            // Rekursiver Aufruf mit allen Unterkategorien // fügt alle deren Produkte hinzu
+            for (Kategorie ukat : kat.get_Unterkategorien()) {
+                summeUnterkategorie.addAll(getAlleProdukte(ukat));
+            }
+            return summeUnterkategorie;
+        }
+            
+        public List<Produkt> getProductByCategory(Kategorie kat){
+            Session session = sessionFactory.openSession();
             String hql = "FROM Produkt p WHERE p IN (SELECT produkt_nr FROM ProduktKategorie WHERE kategorie_id.kategorie_id = :kat_id)";
             Query<Produkt> q = session.createQuery(hql,Produkt.class);
             q.setParameter("kat_id", kat.get_kategorie_id());
@@ -210,11 +186,11 @@ public List<Produkt> getAlleProdukte(Kategorie kat){
             List<Produkt> produkte = q.getResultList();
             session.close();
             return produkte;
-    }
+        }
 
     public List<Produkt> getTopProductsRANKING(int k){
         Session session = sessionFactory.openSession();
-        String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1) ORDER BY verkaufsrang ASC"; // TODO: ist das sauber? ^^
+        String hql = "from Produkt where verkaufsrang < :k AND verkaufsrang != (-1) ORDER BY verkaufsrang ASC"; // -1 = keine Verkaufsrang
         Query<Produkt> q = session.createQuery(hql,Produkt.class);
         q.setParameter("k",k);
         
@@ -241,7 +217,6 @@ public List<Produkt> getAlleProdukte(Kategorie kat){
     public List<Produkt> getTopProductsRATING(int k){
         Session session = sessionFactory.openSession();
         String hql = """
-            
             FROM Produkt p JOIN Rezension r ON p.produkt_nr = r.produkt_nr.produkt_nr
             GROUP BY p.produkt_nr 
             ORDER BY p.rating DESC, count(r.person_id) DESC, p.titel ASC LIMIT :k  
@@ -271,29 +246,6 @@ public List<Produkt> getAlleProdukte(Kategorie kat){
 
     public List<Produkt> getSimilarCheaperProduct(String produkt_nr){
         Session session = sessionFactory.openSession();
-
-        // HQL akzeptiert kein SELECT von einer Subquery und unterstützt wohl auch kein UNION
-        // DAS IST DIE ALTE VARIANTE DIE FUNKTIONIERT ABER UNCOOL IST
-        // // String hql = """
-        // // FROM Produkt p
-        // // WHERE p.produkt_nr IN (
-        // //     SELECT a.produkt_nr.produkt_nr
-        // //     FROM Angebot a
-        // //     WHERE 
-        // //         (a.produkt_nr.produkt_nr IN (
-        // //             SELECT ap.produkt_nr2.produkt_nr FROM AehnlicheProdukte ap WHERE ap.produkt_nr1.produkt_nr = :produkt_nrA
-        // //         ) 
-        // //         OR a.produkt_nr.produkt_nr IN (
-        // //             SELECT ap.produkt_nr1.produkt_nr FROM AehnlicheProdukte ap WHERE ap.produkt_nr2.produkt_nr = :produkt_nrB
-        // //         ))
-        // //         AND a.preis < (
-        // //             SELECT MAX(a2.preis)
-        // //             FROM Angebot a2
-        // //             WHERE a2.produkt_nr.produkt_nr = :produkt_nrC
-        // //         )
-        // // )
-        // // """;
-
         Produkt unserProdukt = session.get(Produkt.class, produkt_nr);
         String hql = """
         FROM Produkt p
@@ -345,11 +297,9 @@ public List<Produkt> getAlleProdukte(Kategorie kat){
         Scanner sc = new Scanner(System.in);
         Rezension rezension = new Rezension();
         System.out.println("Wie lautet der (genaue) Name der Person?");
-        // rezension.set_Person_id(getPersonByName(sc.nextLine())); // PROD
-        rezension.set_Person_id(getPersonByName("Va")); // TESTING
+        rezension.set_Person_id(getPersonByName(sc.nextLine()));
         System.out.println("Wie lautet die Produktnummer?");
-        // rezension.set_Produkt_nr(getProduct(sc.nextLine())); // PROD
-        rezension.set_Produkt_nr(getProduct("B0000668PG")); // TESTING
+        rezension.set_Produkt_nr(getProduct(sc.nextLine()));
         System.out.println("Wie lautet die Kurzbeschreibung?");
         rezension.set_Summary(sc.nextLine());
         System.out.println("Welche Wertung von 1 bis 5?");
