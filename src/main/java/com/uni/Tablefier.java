@@ -1,7 +1,13 @@
 package com.uni;
 
-import java.lang.reflect.*;
-import java.util.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.uni.entities.Kategorie;
+
+import hu.webarticum.treeprinter.SimpleTreeNode;
 
 public class Tablefier {
 
@@ -95,15 +101,15 @@ public class Tablefier {
      public void printTree(Kategorie wurzel){
         SimpleTreeNode rootNode = new SimpleTreeNode(wurzel.get_name());
         for (Kategorie children : wurzel.get_Unterkategorien()){
-            rootNode.addChild(new SimpleTreeNode(children.get_Unterkategorien()));
+            rootNode.addChild(new SimpleTreeNode(children.get_name()));
 
         }
         
     }
 
-    private static TreeNode convertToTreeNode(Kategorie kategorie) {
-        SimpleTreeNode node = new SimpleTreeNode(kategorie.getName());
-        for (Kategorie child : kategorie.getChildren()) {
+    public SimpleTreeNode convertToTreeNode(Kategorie kategorie) {
+        SimpleTreeNode node = new SimpleTreeNode(kategorie.get_name());
+        for (Kategorie child : kategorie.get_Unterkategorien()) {
             node.addChild(convertToTreeNode(child));
         }
         return node;
