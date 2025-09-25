@@ -1,6 +1,8 @@
 package com.uni.entities;
 
-public class RezensionId {
+import java.io.Serializable;
+
+public class RezensionId implements Serializable {
     private String produkt_nr;
     private int person_id;
 
