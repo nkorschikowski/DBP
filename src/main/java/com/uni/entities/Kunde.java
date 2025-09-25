@@ -38,6 +38,14 @@ public class Kunde {
         this.kontonummer = kontonummer;
     }
 
+     public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public Person get_Person_id() {
         return person_id;
     }
