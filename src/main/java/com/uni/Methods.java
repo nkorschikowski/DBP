@@ -22,14 +22,14 @@ public class Methods implements Interface{
 
     private SessionFactory sessionFactory;
     
-    public void init(){ // TODO
+    public void init(){
         System.out.println("Die Sitzung wird aufgebaut!"); // LOG
         sessionFactory = HibernateUtil.buildSessionFactory();
         //das laden der Properties ist in HibernateUtil geregelt
         System.out.println("Sitzungsaufbau abgeschlossen!"); // LOG
     };
 
-    public void finish(){ // TODO
+    public void finish(){
         System.out.println("Sitzund wird beendet"); // LOG
         if(sessionFactory!=null){
             sessionFactory.close();
