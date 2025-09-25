@@ -3,22 +3,10 @@
     "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 
 <hibernate-configuration>
-    <session-factory>
-        <!--postgresql dialect for dbms-->
-        <!-- <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property> -->
-
-        <!--properties for db connection-->
-        <!-- die 4 müssen über Porperty Datei laufen und wird in HibernateUtil.java überschrieben --> 
-        <!-- TODO: funktioniert noch nicht (läuft noch über diese cfg)-->
-        <!-- <property name="hibernate.connection.driver_class">org.postgresql.Driver</property>
-        <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/test</property>
-        <property name="hibernate.connection.username">test</property>
-        <property name="hibernate.connection.password">test</property> -->
-        
+    <session-factory>        
         <property name="hibernate.hbm2ddl.auto">update</property>
-        <property name="hibernate.show_sql">true</property>
 
-        <!-- for seeing logs of sql queries (good for errors)-->
+        <!-- SQL logging -->
         <property name="hibernate.show_sql">false</property>
         <property name="hibernate.format_sql">true</property>
         <property name="hibernate.use_sql_comments">true</property>
