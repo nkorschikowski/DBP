@@ -38,14 +38,20 @@ public class App
                     meth.getProducts(sc.nextLine()); // PROD
                     break;
                 case "getCategoryTree":
-                    //wurzel in main methode laden
                     wurzel = meth.getCategoryTree();
                     System.out.println("wurzel erstellt...");
+
+                    // Print the tree
+                    TreeNode treeRoot = printer.convertToTreeNode(wurzel);
+                    new ListingTreePrinter().print(treeRoot);
+                    
                     break;
-                case "getProductsByCategoryPath": // TODO
-                    //per gespeichertem wurzelobjekt aufrufen
-                    //änderungen an interface und methode :-(
-                    meth.getProductsByCategoryPath(wurzel);
+                 case "getProdutcsByCategoryPath": // TODO
+                    System.out.println("Eingabe des Pfades wird erwartet ...");
+                    String knotenPfad = sc.nextLine();
+
+                    String pfad = "/Formats/Audio CDs/"; //Mystery & Thrillers
+                    meth.getProdutcsByCategoryPath(pfad,wurzel);
                     break;
                 case "getTopProductsRANKING":
                     System.out.println("Gib das Threshhold an");
